@@ -2,8 +2,19 @@
 //! you are building an executable. If you are making a library, the convention
 //! is to delete this file and start with root.zig instead.
 const std = @import("std");
+const dl = @import("1_DynamicList/DynamicList.zig");
 
 pub fn main() !void {
+    const print = std.debug.print;
+    const allocator = std.heap.page_allocator;
+
+    const list = dl.DynamicList(i32).init(&allocator);
+    try print("This list has {u} and value {u}", .{ list.size(), list[0] });
+
+    initialBloat();
+}
+
+fn initialBloat() void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
     std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
 
