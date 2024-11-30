@@ -6,28 +6,14 @@ const dl = @import("1_DynamicList/DynamicList.zig");
 
 pub fn main() !void {
     const print = std.debug.print;
-    const allocator = std.heap.page_allocator;
+    var allocator = std.heap.page_allocator;
 
-    const list = dl.DynamicList(i32).init(&allocator);
-    try print("This list has {u} and value {u}", .{ list.size(), list[0] });
+    var list = try dl.DynamicList(i32).init(&allocator);
 
-    initialBloat();
-}
+    print("CurrentSize {u}", list.size());
+    try list.add(10);
 
-fn initialBloat() void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
-
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
-
-    try bw.flush(); // Don't forget to flush!
+    print("The size of this list is: {} and position 0 contains: {}", .{ list.size(), list.get(0) });
 }
 
 test "simple test" {
