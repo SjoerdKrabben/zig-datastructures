@@ -8,14 +8,10 @@ pub fn DynamicList(comptime T: type) type {
 
         items: []T,
         capacity: usize,
-        allocator: *Allocator,
+        allocator: Allocator,
 
-        pub fn init(allocator: *Allocator) Allocator.Error!Self {
-            return Self{
-                .items = &[_]T{},
-                .capacity = 0,
-                .allocator = allocator,
-            };
+        pub fn init(allocator: Allocator) Allocator.Error!Self {
+            return Self{ .items = &[_]T{}, .capacity = 0, .allocator = allocator };
         }
 
         pub fn deinit(self: Self) void {
@@ -24,15 +20,17 @@ pub fn DynamicList(comptime T: type) type {
             }
         }
 
-        pub fn size(self: Self) usize {
-            return self.capacity;
+        pub fn size(self: *Self) usize {
+            return self.items.len;
         }
 
         pub fn add(self: *Self, item: T) Allocator.Error!void {
             const new_capacity = self.capacity + 1;
             const new_len = self.items.len + 1;
 
-            const new_items = try self.allocator.realloc(T, new_capacity);
+            const new_items = try self.allocator.alloc(T, new_capacity);
+
+            @memcpy(new_items[0..self.items.len], self.items);
 
             if (self.capacity > 0) {
                 self.allocator.free(self.items);
@@ -40,7 +38,7 @@ pub fn DynamicList(comptime T: type) type {
 
             self.items = new_items;
             self.capacity = new_capacity;
-            self.items[new_len] = item;
+            self.items[new_len - 1] = item;
         }
 
         pub fn remove(self: Self) void {
@@ -57,7 +55,7 @@ pub fn DynamicList(comptime T: type) type {
             return false;
         }
 
-        pub fn get(self: Self, i: u8) T {
+        pub fn get(self: Self, i: usize) T {
             return self.items[i];
         }
 

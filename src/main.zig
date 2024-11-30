@@ -6,14 +6,16 @@ const dl = @import("1_DynamicList/DynamicList.zig");
 
 pub fn main() !void {
     const print = std.debug.print;
-    var allocator = std.heap.page_allocator;
+    const allocator = std.heap.page_allocator;
 
-    var list = try dl.DynamicList(i32).init(&allocator);
+    var list = try dl.DynamicList(i32).init(allocator);
 
-    print("CurrentSize {u}", list.size());
-    try list.add(10);
+    for (0..10) |i| {
+        const value = 10 * @as(i32, @intCast(i));
+        try list.add(value);
 
-    print("The size of this list is: {} and position 0 contains: {}", .{ list.size(), list.get(0) });
+        print("The size of this list is: {} and position {} and value: {} \n", .{ list.size(), i, list.get(i) });
+    }
 }
 
 test "simple test" {
