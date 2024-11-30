@@ -41,9 +41,17 @@ pub fn DynamicList(comptime T: type) type {
             self.items[new_len - 1] = item;
         }
 
-        pub fn remove(self: Self) void {
-            self.items[self.capacity + 1] = null;
-            self.capacity -= 1;
+        pub fn remove(self: *Self, position: u8) Allocator.Error!void {
+            if (position >= self.items.len) {
+                @panic("Index out of bounds");
+            }
+
+            if (position < self.items.len - 1) {
+                @memcpy(self.items.ptr + position, self.items.ptr + position + 1);
+            }
+
+            self.items = self.items[0 .. self.items.len - 1];
+            self.capacity - 1;
         }
 
         pub fn contains(self: Self, item: T) bool {
@@ -63,4 +71,25 @@ pub fn DynamicList(comptime T: type) type {
             self.items[position] = item;
         }
     };
+}
+
+test "createListAndTestFunctions" {
+    const allocator = std.heap.page_allocator;
+    var list = try DynamicList(i32).init(allocator);
+
+    for (0..10) |i| {
+        const value = 10 * @as(i32, @intCast(i));
+        try list.add(value);
+
+        print("The size of this list is: {} and position {} and value: {} \n", .{ list.size(), i, list.get(i) });
+    }
+
+    list.set(5, 3);
+    list.set(88, 5);
+    try list.remove(4);
+    try list.remove(1);
+
+    for (0..10) |i| {
+        print("The size of this list is: {} and position {} and value: {} \n", .{ list.size(), i, list.get(i) });
+    }
 }

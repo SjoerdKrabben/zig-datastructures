@@ -3,34 +3,49 @@
 //! is to delete this file and start with root.zig instead.
 const std = @import("std");
 const dl = @import("1_DynamicList/DynamicList.zig");
+const print = std.debug.print;
+var selection: u8 = 9;
 
 pub fn main() !void {
-    const print = std.debug.print;
-    const allocator = std.heap.page_allocator;
+    const options = [5][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue" };
 
-    var list = try dl.DynamicList(i32).init(allocator);
+    try showMain(options[0..5]);
 
-    for (0..10) |i| {
-        const value = 10 * @as(i32, @intCast(i));
-        try list.add(value);
-
-        print("The size of this list is: {} and position {} and value: {} \n", .{ list.size(), i, list.get(i) });
+    while (selection != 0) {
+        switch (selection) {
+            1 => showDynamicList(),
+            2 => showDoublyLinkedList(),
+            else => break,
+        }
     }
 }
 
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // Try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
+fn showMain(opts: *const [5][]const u8) !void {
+    const stdout = std.io.getStdOut().writer();
+    const stdin = std.io.getStdIn().reader();
+    var inputBuffer: [8]u8 = undefined;
+
+    try stdout.print("\n", .{});
+    try stdout.print("Kies uit de verschillende datastructuren en algoritmes om ze te testen: \n", .{});
+    try stdout.print("\n", .{});
+    for (opts) |option| {
+        print("{s} \n", .{option});
+    }
+    try stdout.print("\n", .{});
+    try stdout.print("Kies een optie: ", .{});
+
+    const input = try stdin.readUntilDelimiterOrEof(&inputBuffer, '\n');
+
+    if (input) |val| {
+        if (val.len == 0) {
+            try stdout.print("Je hebt niets ingevuld!\n", .{});
+        } else {
+            const byteValue: []u8 = val[0..1];
+            const index = try std.fmt.parseInt(usize, byteValue, 10) - 1;
+            try stdout.print("Je hebt {s} gekozen!\n", .{opts[index]});
+        }
+    }
 }
 
-test "fuzz example" {
-    const global = struct {
-        fn testOne(input: []const u8) anyerror!void {
-            // Try passing `--fuzz` to `zig build test` and see if it manages to fail this test case!
-            try std.testing.expect(!std.mem.eql(u8, "canyoufindme", input));
-        }
-    };
-    try std.testing.fuzz(global.testOne, .{});
-}
+fn showDynamicList() void {}
+fn showDoublyLinkedList() void {}
