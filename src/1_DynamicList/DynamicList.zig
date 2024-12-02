@@ -46,17 +46,17 @@ pub fn DynamicList(comptime T: type) type {
                 @panic("Index out of bounds");
             }
 
-            if (position < self.items.len - 1) {
-                @memcpy(self.items.ptr + position, self.items.ptr + position + 1);
+            var i: usize = position;
+            while (i < self.items.len - 1) : (i += 1) {
+                self.items[i] = self.items[i + 1];
             }
 
             self.items = self.items[0 .. self.items.len - 1];
-            self.capacity - 1;
         }
 
         pub fn contains(self: Self, item: T) bool {
-            for (self.items[0..]) |it| {
-                if (it == item) {
+            for (self.items) |list_item| {
+                if (std.meta.eql(list_item, item)) {
                     return true;
                 }
             }
@@ -67,13 +67,13 @@ pub fn DynamicList(comptime T: type) type {
             return self.items[i];
         }
 
-        pub fn set(self: Self, item: T, position: u8) void {
+        pub fn set(self: Self, position: u8, item: T) void {
             self.items[position] = item;
         }
     };
 }
 
-test "createListAndTestFunctions" {
+test "createListAndTestFunctionsWithNumbers" {
     const allocator = std.heap.page_allocator;
     var list = try DynamicList(i32).init(allocator);
 
@@ -85,11 +85,13 @@ test "createListAndTestFunctions" {
     }
 
     list.set(5, 3);
-    list.set(88, 5);
+    list.set(7, 88);
     try list.remove(4);
     try list.remove(1);
 
-    for (0..10) |i| {
+    for (0..list.size()) |i| {
         print("The size of this list is: {} and position {} and value: {} \n", .{ list.size(), i, list.get(i) });
     }
+
+    print("The list contains 88? {}\n", .{list.contains(88)});
 }
