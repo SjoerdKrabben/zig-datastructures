@@ -54,7 +54,7 @@ pub fn DynamicList(comptime T: type) type {
             self.items = self.items[0 .. self.items.len - 1];
         }
 
-        pub fn contains(self: Self, item: T) bool {
+        pub fn contains(self: *Self, item: T) bool {
             for (self.items) |list_item| {
                 if (std.meta.eql(list_item, item)) {
                     return true;
@@ -76,6 +76,7 @@ pub fn DynamicList(comptime T: type) type {
 test "createListAndTestFunctionsWithNumbers" {
     const allocator = std.heap.page_allocator;
     var list = try DynamicList(i32).init(allocator);
+    defer list.deinit();
 
     for (0..10) |i| {
         const value = 10 * @as(i32, @intCast(i));
@@ -95,3 +96,23 @@ test "createListAndTestFunctionsWithNumbers" {
 
     print("The list contains 88? {}\n", .{list.contains(88)});
 }
+
+test "compareStructs" {
+    const allocator = std.heap.page_allocator;
+    const Names = struct { id: u8, name: []const u8 };
+    var list = try DynamicList(Names).init(allocator);
+    defer list.deinit();
+
+    const pietje = Names{ .id = 1, .name = "Pietje" };
+    const jan = Names{ .id = 2, .name = "Jan" };
+    const pieter = Names{ .id = 3, .name = "Pieter" };
+
+    try list.add(pietje);
+    try list.add(jan);
+
+    print("{}\n", .{list.contains(jan)});
+    print("{}\n", .{list.contains(pietje)});
+    print("{}\n", .{list.contains(pieter)});
+}
+
+test "addJsonFileToDynamicList" {}
