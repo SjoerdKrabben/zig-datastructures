@@ -2,8 +2,10 @@
 //! you are building an executable. If you are making a library, the convention
 //! is to delete this file and start with root.zig instead.
 const std = @import("std");
+const meta = std.meta;
 const dl = @import("1_DynamicList/DynamicList.zig");
 const jsonDataset = @import("99_JSONParser/JsonParser.zig");
+const allocator = std.heap.page_allocator;
 const print = std.debug.print;
 var selection: u8 = 9;
 
@@ -11,8 +13,9 @@ pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
     const options = [5][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue" };
 
-    try jsonDataset.loadStrFromFile();
+    const dataset = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
 
+    std.debug.print("dataset has items: {any}", .{dataset.lijst_null_1});
     while (true) {
         switch (selection) {
             0 => {
