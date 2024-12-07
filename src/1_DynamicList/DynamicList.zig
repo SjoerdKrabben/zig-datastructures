@@ -52,6 +52,7 @@ pub fn DynamicList(comptime T: type) type {
             }
 
             self.items = self.items[0 .. self.items.len - 1];
+            self.capacity -= 1;
         }
 
         pub fn contains(self: *Self, item: T) bool {

@@ -15,7 +15,7 @@ const Test_dataset = struct {
     }
 };
 
-pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Dataset_sorteren {
+pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Test_dataset {
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
 
@@ -26,25 +26,9 @@ pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Dataset
     defer parsed.deinit();
 
     const source: Dataset_sorteren = parsed.value;
-    const dataset: Test_dataset = undefined;
-    std.debug.print("source: {any}\n", .{@typeInfo(source.lijst_aflopend_2)});
-    std.debug.print("dest: {any}\n", .{@typeInfo(dataset.items.lijst_aflopend_2)});
+    var dataset: Test_dataset = undefined;
 
-    // const dataset_items = try allocateFieldsToHeap(allocator, parsed.value);
-
-    // dataset.items = dataset_items;
-
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_aflopend_2)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_oplopend_2)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_float_8001)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_gesorteerd_aflopend_3)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_herhaald_1000)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_leeg_0)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_null_1)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_null_3)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_oplopend_10000)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_willekeurig_10000)});
-    // std.debug.print("{any}\n", .{dataset.readField(.lijst_willekeurig_3)});
+    dataset.items = try allocateFieldsToHeap(allocator, source);
 
     return dataset;
 }
@@ -53,17 +37,17 @@ fn allocateFieldsToHeap(allocator: std.mem.Allocator, source: Dataset_sorteren) 
     var result: Dataset_sorteren = undefined;
 
     result.lijst_aflopend_2 = try allocator.dupe(i64, source.lijst_aflopend_2);
-    result.lijst_oplopend_2 = try allocator.dupe([]i64, source.lijst_oplopend_2);
-    result.lijst_float_8001 = try allocator.dupe([]f128, source.lijst_float_8001);
-    result.lijst_gesorteerd_aflopend_3 = try allocator.dupe([]u8, source.lijst_gesorteerd_aflopend_3);
-    result.lijst_gesorteerd_oplopend_3 = try allocator.dupe([]u8, source.lijst_gesorteerd_oplopend_3);
-    result.lijst_herhaald_1000 = try allocator.dupe([]i8, source.lijst_herhaald_1000);
-    result.lijst_leeg_0 = try allocator.dupe([]u8, source.lijst_leeg_0);
-    result.lijst_null_1 = try allocator.dupe([]u8, source.lijst_null_1);
-    result.lijst_null_3 = try allocator.dupe([]u8, source.lijst_null_3);
-    result.lijst_oplopend_10000 = try allocator.dupe([]u16, source.lijst_oplopend_10000);
-    result.lijst_willekeurig_10000 = try allocator.dupe([]u16, source.lijst_willekeurig_10000);
-    result.lijst_willekeurig_3 = try allocator.dupe([]u8, source.lijst_willekeurig_3);
+    result.lijst_oplopend_2 = try allocator.dupe(i64, source.lijst_oplopend_2);
+    result.lijst_float_8001 = try allocator.dupe(f128, source.lijst_float_8001);
+    result.lijst_gesorteerd_aflopend_3 = try allocator.dupe(u8, source.lijst_gesorteerd_aflopend_3);
+    result.lijst_gesorteerd_oplopend_3 = try allocator.dupe(u8, source.lijst_gesorteerd_oplopend_3);
+    result.lijst_herhaald_1000 = try allocator.dupe(i8, source.lijst_herhaald_1000);
+    result.lijst_leeg_0 = try allocator.dupe(u8, source.lijst_leeg_0);
+    result.lijst_null_1 = try allocator.dupe(?u8, source.lijst_null_1);
+    result.lijst_null_3 = try allocator.dupe(?u8, source.lijst_null_3);
+    result.lijst_oplopend_10000 = try allocator.dupe(u16, source.lijst_oplopend_10000);
+    result.lijst_willekeurig_10000 = try allocator.dupe(u16, source.lijst_willekeurig_10000);
+    result.lijst_willekeurig_3 = try allocator.dupe(u8, source.lijst_willekeurig_3);
 
     return result;
 }

@@ -15,7 +15,7 @@ pub fn main() !void {
 
     const dataset = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
 
-    std.debug.print("dataset has items: {any}", .{dataset.lijst_null_1});
+    std.debug.print("dataset has items: {any}", .{dataset.items.lijst_oplopend_10000});
     while (true) {
         switch (selection) {
             0 => {
