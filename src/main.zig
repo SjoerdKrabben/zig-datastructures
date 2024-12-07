@@ -3,8 +3,8 @@
 //! is to delete this file and start with root.zig instead.
 const std = @import("std");
 const meta = std.meta;
+const jsonDataset = @import("json_parser.zig");
 const dl = @import("1_DynamicList/DynamicList.zig");
-const jsonDataset = @import("99_JSONParser/JsonParser.zig");
 const allocator = std.heap.page_allocator;
 const print = std.debug.print;
 var selection: u8 = 9;
@@ -94,4 +94,16 @@ fn showDoublyLinkedList() !u8 {
 
     defer file.close();
     return 0;
+}
+
+test "addJsonFileToDynamicList" {
+    const dataset = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
+    var dList = try dl.DynamicList(i64).init(allocator);
+
+    var count: u32 = 0;
+    for (dataset.readField(.lijst_herhaald_1000)) |item| {
+        try dList.add(item);
+        count += 1;
+    }
+    print("Count: {}\n", .{count});
 }

@@ -15,6 +15,10 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    // Modules
+    // const jsonParser = b.createModule(.{ .root_source_file = b.path("src/99_JSONParser/JsonParser.zig") });
+
+    // static Libraries
     const lib = b.addStaticLibrary(.{
         .name = "DataStructures",
         // In this case the main source file is merely a path, however, in more
@@ -29,6 +33,7 @@ pub fn build(b: *std.Build) void {
     // running `zig build`).
     b.installArtifact(lib);
 
+    // Executable
     const exe = b.addExecutable(.{
         .name = "DataStructures",
         .root_source_file = b.path("src/main.zig"),

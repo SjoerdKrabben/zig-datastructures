@@ -1,4 +1,6 @@
 const std = @import("std");
+const jsonDataset = @import("../json_parser.zig").jsonDataset;
+
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
 
@@ -8,10 +10,11 @@ pub fn DynamicList(comptime T: type) type {
 
         items: []T,
         capacity: usize,
+        length: usize,
         allocator: Allocator,
 
         pub fn init(allocator: Allocator) Allocator.Error!Self {
-            return Self{ .items = &[_]T{}, .capacity = 0, .allocator = allocator };
+            return Self{ .items = &[_]T{}, .capacity = 0, .length = 0, .allocator = allocator };
         }
 
         pub fn deinit(self: Self) void {
@@ -25,20 +28,26 @@ pub fn DynamicList(comptime T: type) type {
         }
 
         pub fn add(self: *Self, item: T) Allocator.Error!void {
-            const new_capacity = self.capacity + 1;
-            const new_len = self.items.len + 1;
+            if (self.length == self.capacity) {
+                const new_capacity = if (self.capacity == 0) 1 else self.capacity * 2;
+                const new_items = try self.allocator.alloc(T, new_capacity);
 
-            const new_items = try self.allocator.alloc(T, new_capacity);
+                if (self.length > 0) {
+                    @memcpy(new_items[0..self.items.len], self.items);
+                }
 
-            @memcpy(new_items[0..self.items.len], self.items);
+                if (self.capacity > 0) {
+                    self.allocator.free(self.items);
+                }
 
-            if (self.capacity > 0) {
-                self.allocator.free(self.items);
+                self.items = new_items;
+                self.capacity = new_capacity;
             }
 
-            self.items = new_items;
-            self.capacity = new_capacity;
-            self.items[new_len - 1] = item;
+            self.items[self.length] = item;
+            self.length += 1;
+            print("Items added: {any} new len var: {any}\n", .{ self.items, self.length });
+            print("Added item: {}, new capacity: {}, new length: {}\n", .{ item, self.capacity, self.length });
         }
 
         pub fn remove(self: *Self, position: u8) Allocator.Error!void {
@@ -47,12 +56,13 @@ pub fn DynamicList(comptime T: type) type {
             }
 
             var i: usize = position;
-            while (i < self.items.len - 1) : (i += 1) {
+            while (i < self.length - 1) : (i += 1) {
                 self.items[i] = self.items[i + 1];
             }
 
-            self.items = self.items[0 .. self.items.len - 1];
+            self.items = self.items[0 .. self.length - 1];
             self.capacity -= 1;
+            self.length -= 1;
         }
 
         pub fn contains(self: *Self, item: T) bool {
@@ -82,18 +92,12 @@ test "createListAndTestFunctionsWithNumbers" {
     for (0..10) |i| {
         const value = 10 * @as(i32, @intCast(i));
         try list.add(value);
-
-        print("The size of this list is: {} and position {} and value: {} \n", .{ list.size(), i, list.get(i) });
     }
 
     list.set(5, 3);
     list.set(7, 88);
     try list.remove(4);
     try list.remove(1);
-
-    for (0..list.size()) |i| {
-        print("The size of this list is: {} and position {} and value: {} \n", .{ list.size(), i, list.get(i) });
-    }
 
     print("The list contains 88? {}\n", .{list.contains(88)});
 }
@@ -115,5 +119,3 @@ test "compareStructs" {
     print("{}\n", .{list.contains(pietje)});
     print("{}\n", .{list.contains(pieter)});
 }
-
-test "addJsonFileToDynamicList" {}
