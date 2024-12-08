@@ -4,11 +4,11 @@
 const std = @import("std");
 const meta = std.meta;
 const jsonDataset = @import("json_parser.zig");
-const dl = @import("1_DynamicList/DynamicList.zig");
-const dll = @import("2_DoublyLinkedList/DoublyLinkedList.zig");
+const dl = @import("datastructures/DynamicList.zig");
+const dll = @import("datastructures/DoublyLinkedList.zig");
 const allocator = std.heap.page_allocator;
 const print = std.debug.print;
-var selection: u8 = 9;
+var selection: u8 = 0;
 
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
