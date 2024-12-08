@@ -15,7 +15,7 @@ const Test_dataset = struct {
     }
 };
 
-pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Test_dataset {
+pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Dataset_sorteren {
     const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
 
@@ -26,9 +26,9 @@ pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Test_da
     defer parsed.deinit();
 
     const source: Dataset_sorteren = parsed.value;
-    var dataset: Test_dataset = undefined;
+    var dataset: Dataset_sorteren = undefined;
 
-    dataset.items = try allocateFieldsToHeap(allocator, source);
+    dataset = try allocateFieldsToHeap(allocator, source);
 
     return dataset;
 }

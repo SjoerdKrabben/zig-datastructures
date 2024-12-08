@@ -13,9 +13,6 @@ pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
     const options = [5][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue" };
 
-    const dataset = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
-
-    std.debug.print("dataset has items: {any}", .{dataset.items.lijst_oplopend_10000});
     while (true) {
         switch (selection) {
             0 => {
@@ -101,7 +98,7 @@ test "addJsonFileToDynamicList" {
     var dList = try dl.DynamicList(i64).init(allocator);
 
     var count: u32 = 0;
-    for (dataset.readField(.lijst_herhaald_1000)) |item| {
+    for (dataset.lijst_willekeurig_3) |item| {
         try dList.add(item);
         count += 1;
     }

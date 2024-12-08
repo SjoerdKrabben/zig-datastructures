@@ -1,5 +1,4 @@
 const std = @import("std");
-const jsonDataset = @import("../json_parser.zig").jsonDataset;
 
 const Allocator = std.mem.Allocator;
 const print = std.debug.print;
@@ -46,7 +45,6 @@ pub fn DynamicList(comptime T: type) type {
 
             self.items[self.length] = item;
             self.length += 1;
-            print("Items added: {any} new len var: {any}\n", .{ self.items, self.length });
             print("Added item: {}, new capacity: {}, new length: {}\n", .{ item, self.capacity, self.length });
         }
 
@@ -115,7 +113,7 @@ test "compareStructs" {
     try list.add(pietje);
     try list.add(jan);
 
-    print("{}\n", .{list.contains(jan)});
-    print("{}\n", .{list.contains(pietje)});
-    print("{}\n", .{list.contains(pieter)});
+    print("list constains jan: {}\n", .{list.contains(jan)});
+    print("list contains pietje: {}\n", .{list.contains(pietje)});
+    print("list contains pieter: {}\n", .{list.contains(pieter)});
 }
