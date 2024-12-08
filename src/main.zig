@@ -5,6 +5,7 @@ const std = @import("std");
 const meta = std.meta;
 const jsonDataset = @import("json_parser.zig");
 const dl = @import("1_DynamicList/DynamicList.zig");
+const dll = @import("2_DoublyLinkedList/DoublyLinkedList.zig");
 const allocator = std.heap.page_allocator;
 const print = std.debug.print;
 var selection: u8 = 9;
@@ -103,4 +104,24 @@ test "addJsonFileToDynamicList" {
         count += 1;
     }
     print("Count: {}\n", .{count});
+}
+
+test "addJsonFileToDoublyLinkedList" {
+    const dataset = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
+    const L = dll.DoublyLinkedList(u8);
+    var list = L{};
+
+    for (dataset.lijst_willekeurig_3) |item| {
+        const node = try allocator.create(L.Node);
+        node.* = L.Node{ .data = item };
+
+        list.append(node);
+    }
+
+    var it = list.first;
+    var index: u32 = 0;
+    while (it) |node| : (it = node.next) {
+        print("Item on index: {} has value: {any}\n", .{ index, node.data });
+        index += 1;
+    }
 }
