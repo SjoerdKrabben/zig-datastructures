@@ -13,9 +13,9 @@ pub fn Stack(comptime T: type) type {
         const L = dll.DoublyLinkedList(T);
 
         list: L,
-        allocator: std.mem.Allocator,
+        allocator: Allocator,
 
-        pub fn init(allocator: std.mem.Allocator) Self {
+        pub fn init(allocator: Allocator) Self {
             return Self{ .list = L{}, .allocator = allocator };
         }
 
