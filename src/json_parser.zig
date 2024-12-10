@@ -1,7 +1,7 @@
 const std = @import("std");
 const meta = std.meta;
 
-const Dataset_sorteren = struct { lijst_aflopend_2: []const i64, lijst_oplopend_2: []i64, lijst_float_8001: []f128, lijst_gesorteerd_aflopend_3: []u8, lijst_gesorteerd_oplopend_3: []u8, lijst_herhaald_1000: []i8, lijst_leeg_0: []u8, lijst_null_1: []?u8, lijst_null_3: []?u8, lijst_oplopend_10000: []u16, lijst_willekeurig_10000: []u16, lijst_willekeurig_3: []u8 };
+pub const Dataset_sorteren = struct { lijst_aflopend_2: []const i64, lijst_oplopend_2: []i64, lijst_float_8001: []f128, lijst_gesorteerd_aflopend_3: []u8, lijst_gesorteerd_oplopend_3: []u8, lijst_herhaald_1000: []i8, lijst_leeg_0: []u8, lijst_null_1: []?u8, lijst_null_3: []?u8, lijst_oplopend_10000: []u16, lijst_willekeurig_10000: []u16, lijst_willekeurig_3: []u8 };
 
 const Test_dataset = struct {
     const Self = @This();
@@ -15,8 +15,9 @@ const Test_dataset = struct {
     }
 };
 
-pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Dataset_sorteren {
-    const file = try std.fs.cwd().openFile(file_path, .{});
+pub fn loadDataset(allocator: std.mem.Allocator) !Dataset_sorteren {
+    const filePath = "./assets/test.json";
+    const file = try std.fs.cwd().openFile(filePath, .{});
     defer file.close();
 
     const file_content = try file.readToEndAlloc(allocator, std.math.maxInt(usize));
