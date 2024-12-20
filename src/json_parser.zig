@@ -15,9 +15,8 @@ const Test_dataset = struct {
     }
 };
 
-pub fn loadDataset(allocator: std.mem.Allocator) !Dataset_sorteren {
-    const filePath = "./assets/test.json";
-    const file = try std.fs.cwd().openFile(filePath, .{});
+pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Dataset_sorteren {
+    const file = try std.fs.cwd().openFile(file_path, .{});
     defer file.close();
 
     const file_content = try file.readToEndAlloc(allocator, std.math.maxInt(usize));
