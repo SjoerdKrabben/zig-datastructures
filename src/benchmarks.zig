@@ -103,8 +103,9 @@ pub fn dllBenchmark2(data: jsonDataset.Dataset_sorteren) ![]const u8 {
 }
 
 pub fn bsBenchmark1(data: jsonDataset.Dataset_sorteren) ![]const u8 {
-    const number = 666;
-    try printMessage("Benchmark 2: Find number in lijst_oplopend_10000");
+    try printMessage("Benchmark 1: Find random number in lijst_oplopend_10000");
+    const rand = std.crypto.random;
+    const number = rand.intRangeAtMost(u16, 0, 10000);
 
     try printMessage("Starting timer...");
     var timer = try Timer.start();
@@ -137,20 +138,8 @@ fn formatToString(input: u64) ![]u8 {
     return result;
 }
 
-// fn printMessage(message: []const u8) !void {
-//     const stdout = std.io.getStdOut().writer();
-// 
-//     try stdout.print("{s}\n", .{message});
-// }
+fn printMessage(message: []const u8) !void {
+    const stdout = std.io.getStdOut().writer();
 
-pub fn randomNumber() !u8 {
-    var prng = std.rand.DefaultPrng.init(blk: {
-        var seed: u64 = undefined;
-        try std.posix.getrandom(std.mem.asBytes(&seed));
-        break :blk seed;
-    });
-
-    const rand = prng.random();
-
-    return rand.int(u8);
+    try stdout.print("{s}\n", .{message});
 }

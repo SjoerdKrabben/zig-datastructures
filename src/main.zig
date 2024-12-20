@@ -10,12 +10,12 @@ var selection: u8 = 0;
 
 pub fn main() !void {
     const testData = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
-    const options = [5][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue" };
+    const options = [6][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue", "6: BinarySearch" };
 
     while (true) {
         switch (selection) {
             0 => {
-                selection = try showMain(options[0..5]);
+                selection = try showMain(options[0..]);
                 continue;
             },
             1 => {
@@ -26,20 +26,45 @@ pub fn main() !void {
                 selection = try benchmarkDoublyLinkedList(testData);
                 continue;
             },
+            3 => {
+                selection = try benchmarkStack(testData);
+                continue;
+            },
+            4 => {
+                selection = try benchmarkDeque(testData);
+                continue;
+            },
+            5 => {
+                selection = try benchmarkPriorityQueue(testData);
+                continue;
+            },
             6 => {
                 selection = try benchmarkBinarySearch(testData);
                 continue;
             },
+            7 => {
+                selection = 10;
+                continue;
+            },
+            8 => {
+                selection = 10;
+                continue;
+            },
+            9 => {
+                selection = 10;
+                continue;
+            },
+
             else => {
                 try printMessage("Program terminated!");
-                selection = 9;
+                selection = 10;
                 break;
             },
         }
     }
 }
 
-fn showMain(opts: *const [5][]const u8) !u8 {
+fn showMain(opts: *const [6][]const u8) !u8 {
     const stdin = std.io.getStdIn().reader();
     var inputBuffer: [10]u8 = undefined;
     var returnValue: u8 = 0;
@@ -107,6 +132,53 @@ fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !u8 {
     return 0;
 }
 
+fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !u8 {
+    try printMessage("Stack LOADING");
+    var results = [1][]const u8{""};
+    _ = data;
+
+    results[0] = "try bm.stBenchmark1(data)";
+
+    try printMessage("\nStack Benchmarks finished!");
+
+    for (results) |r| {
+        try std.io.getStdOut().writer().print("{s}", .{r});
+    }
+
+    return 0;
+}
+
+fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !u8 {
+    try printMessage("Double-Ended Queue LOADING");
+    var results = [1][]const u8{""};
+    _ = data;
+
+    results[0] = "try bm.dqBenchmark1(data";
+
+    try printMessage("\nDouble-Ended Queue Benchmarks finished!");
+
+    for (results) |r| {
+        try std.io.getStdOut().writer().print("{s}", .{r});
+    }
+
+    return 0;
+}
+
+fn benchmarkPriorityQueue(data: jsonDataset.Dataset_sorteren) !u8 {
+    try printMessage("PriorityQueue LOADING");
+    var results = [1][]const u8{""};
+    _ = data;
+
+    results[0] = "try bm.pqBenchmark1(data)";
+
+    try printMessage("\nPriorityQueue Benchmarks finished!");
+
+    for (results) |r| {
+        try std.io.getStdOut().writer().print("{s}", .{r});
+    }
+
+    return 0;
+}
 fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("BinarySearch test");
     var results = [1][]const u8{""};
