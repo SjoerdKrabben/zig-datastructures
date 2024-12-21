@@ -10,7 +10,7 @@ var selection: u8 = 0;
 
 pub fn main() !void {
     const testData = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
-    const options = [6][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue", "6: BinarySearch" };
+    const options = [14][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue", "6: BinarySearch", "7: Insertion Sort", "8: Selection Sort", "9: Quicksort", "10: Parallel-Merge Sort", "11: Hashtable", "12: Graph", "13: Dijkstra", "14: AVL-Searchtree" };
 
     while (true) {
         switch (selection) {
@@ -64,7 +64,7 @@ pub fn main() !void {
     }
 }
 
-fn showMain(opts: *const [6][]const u8) !u8 {
+fn showMain(opts: *const [14][]const u8) !u8 {
     const stdin = std.io.getStdIn().reader();
     var inputBuffer: [10]u8 = undefined;
     var returnValue: u8 = 0;

@@ -12,7 +12,7 @@ pub fn HashTable(comptime T: type) type {
 
         const Entry = struct {
             key: ?[]const u8,
-            value: T,
+            value: ?T,
         };
 
         allocator: Allocator,
@@ -35,34 +35,39 @@ pub fn HashTable(comptime T: type) type {
 
         pub fn insert(self: *Self, key: []const u8, value: T) !void {
             var index = getHash(key) % self.capacity;
-            var probes = 0;
+            var probes: usize = 0;
 
             while (true) {
                 const entry = &self.table[index];
 
-                if (entry.key == null or entry.key.?) {
+                if (entry.key == null) {
                     entry.* = Entry{ .key = key, .value = value };
                 } else if (std.mem.eql(u8, entry.key.?, key)) {
                     entry.value = value;
+                    return;
                 } else {
                     probes += 1;
                     if (probes >= self.capacity) {
                         return error.HashTableIsFull;
                     }
 
-                    index = (index + 1) % self.capacity;
+                    index = nextIndex(self, index);
                 }
             }
         }
 
-        pub fn get(self: *Self, key: []const u8) !T {
-            var index = self.getHash(key) % self.capacity;
+        pub fn get(self: *Self, key: []const u8) !?T {
+            var index = getHash(key) % self.capacity;
             var probes: usize = 0;
 
             while (true) {
                 const entry = &self.table[index];
 
-                if (std.mem.eql(u8, entry.key.?, self.key)) {
+                if (entry.key == null) {
+                    return error.HashTableEntryNotFound;
+                }
+
+                if (std.mem.eql(u8, entry.key.?, key)) {
                     return entry.value;
                 } else {
                     probes += 1;
@@ -70,13 +75,13 @@ pub fn HashTable(comptime T: type) type {
                         return error.HashTableEntryNotFound;
                     }
 
-                    index = (index + 1) % self.capacity;
+                    index = nextIndex(self, index);
                 }
             }
         }
 
         pub fn delete(self: *Self, key: []const u8) !void {
-            var index = self.getHash(key) % self.capacity;
+            var index = getHash(key) % self.capacity;
             var probes: usize = 0;
 
             while (true) {
@@ -90,7 +95,7 @@ pub fn HashTable(comptime T: type) type {
                         return error.HashTableEntryNotFound;
                     }
 
-                    index = (index + 1) % self.capacity;
+                    index = nextIndex(self, index);
                 }
             }
         }
@@ -107,22 +112,29 @@ pub fn HashTable(comptime T: type) type {
             }
             return hash;
         }
+
+        fn nextIndex(self: *Self, index: usize) usize {
+            return (index + 1) % self.capacity;
+        }
     };
 }
 
 test "HashTable Operations" {
     const allocator = testing.allocator;
 
-    // Maak een HashTable met capaciteit 5
+    std.debug.print("Maakt een HashTable met capaciteit 5\n", .{});
+    // Maakt een HashTable met capaciteit 5
     var ht = try HashTable(u32).init(allocator, 5);
     defer ht.deinit();
 
-    // Voeg items toe aan de tabel
+    std.debug.print("Voegt items toe aan de tabel\n", .{});
+    // Voegt items toe aan de tabel
     try ht.insert("key1", 10);
     try ht.insert("key2", 20);
     try ht.insert("key3", 30);
 
-    // Controleer dat we de juiste waarden terugkrijgen
+    std.debug.print("Controleert dat we de juiste waarden terugkrijgen\n", .{});
+    // Controleert dat we de juiste waarden terugkrijgen
     const value1 = try ht.get("key1");
     const value2 = try ht.get("key2");
     const value3 = try ht.get("key3");
@@ -138,16 +150,14 @@ test "HashTable Operations" {
 
     // Verwijder een sleutel
     try ht.delete("key1");
-    const result = ht.get("key1");
-    try testing.expect(result catch |err| err == error.HashTableEntryNotFound);
+    try testing.expectError(error.HashTableEntryNotFound, ht.get("key1"));
 
     // Voeg meer items toe om de tabel te vullen
     try ht.insert("key4", 40);
     try ht.insert("key5", 50);
 
     // Controleer dat de tabel vol raakt
-    const full_insert = ht.insert("key6", 60);
-    try testing.expect(full_insert catch |err| err == error.HashTableIsFull);
+    try testing.expectError(error.HashTableIsFull, ht.insert("key6", 60));
 }
 
 test "HashTable collision handling" {
@@ -169,7 +179,8 @@ test "HashTable collision handling" {
 
     // Verwijder een sleutel en controleer dat probing blijft werken
     try ht.delete("B");
-    try testing.expect(try ht.get("B") catch |err| err == error.HashTableEntryNotFound);
+    try testing.expectError(error.HashTableEntryNotFound, ht.get("B"));
+
     try testing.expectEqual(try ht.get("C"), 3);
 
     // Voeg een nieuwe sleutel toe (die de verwijderde plaats kan hergebruiken)
@@ -193,6 +204,5 @@ test "HashTable handles null keys and values" {
 
     // Verwijder de sleutel en controleer dat deze wordt verwijderd
     try ht.delete("key1");
-    const result = ht.get("key1");
-    try testing.expect(result catch |err| err == error.HashTableEntryNotFound);
+    try testing.expectError(error.HashTableEntryNotFound, ht.get("key1"));
 }
