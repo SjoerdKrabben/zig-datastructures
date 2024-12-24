@@ -1,7 +1,7 @@
 const std = @import("std");
 const meta = std.meta;
 
-pub const Dataset_sorteren = struct { lijst_aflopend_2: []const i64, lijst_oplopend_2: []i64, lijst_float_8001: []f128, lijst_gesorteerd_aflopend_3: []u8, lijst_gesorteerd_oplopend_3: []u8, lijst_herhaald_1000: []i8, lijst_leeg_0: []u8, lijst_null_1: []?u8, lijst_null_3: []?u8, lijst_oplopend_10000: []u16, lijst_willekeurig_10000: []u16, lijst_willekeurig_3: []u8 };
+pub const Dataset_sorteren = struct { lijst_aflopend_2: []i64, lijst_oplopend_2: []i64, lijst_float_8001: []f128, lijst_gesorteerd_aflopend_3: []u8, lijst_gesorteerd_oplopend_3: []u8, lijst_herhaald_1000: []i8, lijst_leeg_0: []u8, lijst_null_1: []?u8, lijst_null_3: []?u8, lijst_oplopend_10000: []i32, lijst_willekeurig_10000: []u16, lijst_willekeurig_3: []u8 };
 
 const Test_dataset = struct {
     const Self = @This();
@@ -45,7 +45,7 @@ fn allocateFieldsToHeap(allocator: std.mem.Allocator, source: Dataset_sorteren) 
     result.lijst_leeg_0 = try allocator.dupe(u8, source.lijst_leeg_0);
     result.lijst_null_1 = try allocator.dupe(?u8, source.lijst_null_1);
     result.lijst_null_3 = try allocator.dupe(?u8, source.lijst_null_3);
-    result.lijst_oplopend_10000 = try allocator.dupe(u16, source.lijst_oplopend_10000);
+    result.lijst_oplopend_10000 = try allocator.dupe(i32, source.lijst_oplopend_10000);
     result.lijst_willekeurig_10000 = try allocator.dupe(u16, source.lijst_willekeurig_10000);
     result.lijst_willekeurig_3 = try allocator.dupe(u8, source.lijst_willekeurig_3);
 

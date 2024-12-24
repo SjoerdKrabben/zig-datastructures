@@ -105,7 +105,7 @@ pub fn dllBenchmark2(data: jsonDataset.Dataset_sorteren) ![]const u8 {
 pub fn bsBenchmark1(data: jsonDataset.Dataset_sorteren) ![]const u8 {
     try printMessage("Benchmark 1: Find random number in lijst_oplopend_10000");
     const rand = std.crypto.random;
-    const number = rand.intRangeAtMost(u16, 0, 10000);
+    const number = rand.intRangeAtMost(i32, 0, 10000);
 
     try printMessage("Starting timer...");
     var timer = try Timer.start();

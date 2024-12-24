@@ -26,4 +26,5 @@ test "binarySearch" {
     try testing.expectEqual(4, binarySearch(array, 0, array.len, 5));
     try testing.expectEqual(0, binarySearch(array, 0, array.len, 1));
     try testing.expectEqual(9, binarySearch(array, 0, array.len - 1, 10));
+    try testing.expectEqual(-1, binarySearch(array, 0, array.len - 1, 11));
 }
