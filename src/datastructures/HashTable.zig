@@ -106,7 +106,7 @@ pub fn HashTable(comptime T: type) type {
 
         fn getHash(key: []const u8) usize {
             var hash: usize = 0;
-            const P: usize = 7;
+            const P: usize = 31;
             for (key) |byte| {
                 hash = hash * P + byte;
             }
@@ -122,18 +122,15 @@ pub fn HashTable(comptime T: type) type {
 test "HashTable Operations" {
     const allocator = testing.allocator;
 
-    std.debug.print("Maakt een HashTable met capaciteit 5\n", .{});
     // Maakt een HashTable met capaciteit 5
     var ht = try HashTable(u32).init(allocator, 5);
     defer ht.deinit();
 
-    std.debug.print("Voegt items toe aan de tabel\n", .{});
     // Voegt items toe aan de tabel
     try ht.insert("key1", 10);
     try ht.insert("key2", 20);
     try ht.insert("key3", 30);
 
-    std.debug.print("Controleert dat we de juiste waarden terugkrijgen\n", .{});
     // Controleert dat we de juiste waarden terugkrijgen
     const value1 = try ht.get("key1");
     const value2 = try ht.get("key2");
@@ -157,6 +154,7 @@ test "HashTable Operations" {
     try ht.insert("key5", 50);
 
     // Controleer dat de tabel vol raakt
+    try ht.insert("key1", 10);
     try testing.expectError(error.HashTableIsFull, ht.insert("key6", 60));
 }
 
@@ -200,7 +198,7 @@ test "HashTable handles null keys and values" {
 
     // Controleer dat null correct wordt opgeslagen
     const value = try ht.get("key1");
-    try testing.expect(value == null);
+    try testing.expect(value.? == null);
 
     // Verwijder de sleutel en controleer dat deze wordt verwijderd
     try ht.delete("key1");
