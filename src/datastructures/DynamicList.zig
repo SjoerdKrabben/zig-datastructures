@@ -48,7 +48,7 @@ pub fn DynamicList(comptime T: type) type {
 
             self.items[self.length] = item;
             self.length += 1;
-            print("Added item: {}, new capacity: {}, new length: {}\n", .{ item, self.capacity, self.length });
+            // print("Added item: {}, new capacity: {}, new length: {}\n", .{ item, self.capacity, self.length });
         }
 
         pub fn remove(self: *Self, position: u8) Allocator.Error!void {
@@ -90,6 +90,10 @@ pub fn DynamicList(comptime T: type) type {
 
         pub fn set(self: Self, position: u8, item: T) void {
             self.items[position] = item;
+        }
+
+        pub fn clear(self: *Self) void {
+            self.length = 0;
         }
     };
 }

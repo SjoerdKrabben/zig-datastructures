@@ -7,6 +7,7 @@ const print = std.debug.print;
 const Timer = std.time.Timer;
 
 var selection: u8 = 0;
+const TOTALRUNS = 15;
 
 pub fn main() !void {
     const testData = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
@@ -102,9 +103,9 @@ fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("DynamicList benchmarks LOADING...");
     var results = [2][]const u8{ "", "" };
 
-    results[0] = try bm.dlBenchmark1(data);
+    results[0] = try bm.dlBenchmark1(data, TOTALRUNS);
 
-    results[1] = try bm.dlBenchmark2(data);
+    results[1] = try bm.dlBenchmark2(data, TOTALRUNS);
 
     try printMessage("\nDynamicList Benchmarks finished!");
 
@@ -116,12 +117,12 @@ fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !u8 {
 }
 
 fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !u8 {
-    try printMessage("DoublyLinkedList LOADING");
+    try printMessage("DoublyLinkedList benchmarks LOADING");
     var results = [2][]const u8{ "", "" };
 
-    results[0] = try bm.dllBenchmark1(data);
+    results[0] = try bm.dllBenchmark1(data, TOTALRUNS);
 
-    results[1] = try bm.dllBenchmark2(data);
+    results[1] = try bm.dllBenchmark2(data, TOTALRUNS);
 
     try printMessage("\nDoublyLinkedList Benchmarks finished!");
 
