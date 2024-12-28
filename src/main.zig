@@ -135,10 +135,10 @@ fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !u8 {
 
 fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("Stack LOADING");
-    var results = [1][]const u8{""};
-    _ = data;
+    var results = [_][]const u8{ "", "" };
 
-    results[0] = "try bm.stBenchmark1(data)";
+    results[0] = try bm.stckBenchmark1(data, TOTALRUNS);
+    results[1] = try bm.stckBenchmark2(data, TOTALRUNS);
 
     try printMessage("\nStack Benchmarks finished!");
 
@@ -151,10 +151,9 @@ fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !u8 {
 
 fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("Double-Ended Queue LOADING");
-    var results = [1][]const u8{""};
-    _ = data;
+    var results = [_][]const u8{""};
 
-    results[0] = "try bm.dqBenchmark1(data";
+    results[0] = try bm.dqueBenchmark1(data, TOTALRUNS);
 
     try printMessage("\nDouble-Ended Queue Benchmarks finished!");
 
@@ -184,7 +183,7 @@ fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("BinarySearch test");
     var results = [1][]const u8{""};
 
-    results[0] = try bm.bsBenchmark1(data);
+    results[0] = try bm.bsrcBenchmark1(data);
 
     try printMessage("\nBinarySearch Benchmarks finished!");
 
