@@ -34,19 +34,23 @@ pub fn PriorityQueue(comptime T: type) type {
 
         pub fn peek(self: *Self) !T {
             if (self.list.size() == 0) {
-                return error.DynamicListEmpty;
+                return error.EmptyQueue;
             }
             return self.list.get(0);
         }
 
         pub fn poll(self: *Self) !T {
             if (self.list.size() == 0) {
-                return error.DynamicListEmpty;
+                return error.EmptyQueue;
             }
             const prio = self.list.get(0);
 
             try self.list.remove(0);
             return prio;
+        }
+
+        pub fn size(self: *Self) usize {
+            return self.list.size();
         }
     };
 }

@@ -11,7 +11,7 @@ const TOTALRUNS = 15;
 
 pub fn main() !void {
     const testData = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
-    const options = [14][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: Queue", "5: PriorityQueue", "6: BinarySearch", "7: Insertion Sort", "8: Selection Sort", "9: Quicksort", "10: Parallel-Merge Sort", "11: Hashtable", "12: Graph", "13: Dijkstra", "14: AVL-Searchtree" };
+    const options = [14][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Insertion Sort", "8: Selection Sort", "9: Quicksort", "10: Parallel-Merge Sort", "11: Hashtable", "12: Graph", "13: Dijkstra", "14: AVL-Searchtree" };
 
     while (true) {
         switch (selection) {
@@ -101,7 +101,7 @@ fn showMain(opts: *const [14][]const u8) !u8 {
 
 fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("DynamicList benchmarks LOADING...");
-    var results = [2][]const u8{ "", "" };
+    var results = [_][]const u8{ "", "" };
 
     results[0] = try bm.dlBenchmark1(data, TOTALRUNS);
 
@@ -118,7 +118,7 @@ fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !u8 {
 
 fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("DoublyLinkedList benchmarks LOADING");
-    var results = [2][]const u8{ "", "" };
+    var results = [_][]const u8{ "", "" };
 
     results[0] = try bm.dllBenchmark1(data, TOTALRUNS);
 
@@ -151,9 +151,10 @@ fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !u8 {
 
 fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("Double-Ended Queue LOADING");
-    var results = [_][]const u8{""};
+    var results = [_][]const u8{ "", "" };
 
     results[0] = try bm.dqueBenchmark1(data, TOTALRUNS);
+    results[1] = try bm.dqueBenchmark2(data, TOTALRUNS);
 
     try printMessage("\nDouble-Ended Queue Benchmarks finished!");
 
@@ -166,10 +167,10 @@ fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !u8 {
 
 fn benchmarkPriorityQueue(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("PriorityQueue LOADING");
-    var results = [1][]const u8{""};
-    _ = data;
+    var results = [_][]const u8{ "", "" };
 
-    results[0] = "try bm.pqBenchmark1(data)";
+    results[0] = try bm.pqueBenchmark1(data, TOTALRUNS);
+    results[1] = try bm.pqueBenchmark2(data, TOTALRUNS);
 
     try printMessage("\nPriorityQueue Benchmarks finished!");
 
@@ -181,7 +182,7 @@ fn benchmarkPriorityQueue(data: jsonDataset.Dataset_sorteren) !u8 {
 }
 fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
     try printMessage("BinarySearch test");
-    var results = [1][]const u8{""};
+    var results = [_][]const u8{""};
 
     results[0] = try bm.bsrcBenchmark1(data);
 

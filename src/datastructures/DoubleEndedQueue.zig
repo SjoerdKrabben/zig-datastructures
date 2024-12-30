@@ -15,7 +15,7 @@ pub fn Deque(comptime T: type) type {
         list: L,
         allocator: Allocator,
 
-        pub fn init(allocator: Allocator) Self {
+        pub fn init(allocator: Allocator) Allocator.Error!Self {
             return Self{ .list = L{}, .allocator = allocator };
         }
 
@@ -45,7 +45,7 @@ pub fn Deque(comptime T: type) type {
         }
 
         pub fn deleteLeft(self: *Self) !T {
-            const node = self.list.popFirst() orelse return error.EmptyDeque;
+            const node = self.list.popFirst() orelse return error.EmptyQueue;
             const data = node.data;
             self.allocator.destroy(node);
 
@@ -53,7 +53,7 @@ pub fn Deque(comptime T: type) type {
         }
 
         pub fn deleteRight(self: *Self) !T {
-            const node = self.list.pop() orelse return error.EmptyDeque;
+            const node = self.list.pop() orelse return error.EmptyQueue;
             const data = node.data;
             self.allocator.destroy(node);
 
@@ -81,17 +81,18 @@ test "deque operations" {
     try deque.insertLeft(0); // {0, 1, 2}
     try deque.insertRight(3); // {0, 1, 2, 3}
 
-    try std.testing.expect(deque.size() == 4);
-    try std.testing.expect(!deque.isEmpty());
+    try testing.expect(deque.size() == 4);
+    try testing.expect(!deque.isEmpty());
 
     // Delete elements
-    try std.testing.expect(try deque.deleteLeft() == 0); // {1, 2, 3}
-    try std.testing.expect(try deque.deleteRight() == 3); // {1, 2}
+    try testing.expect(try deque.deleteLeft() == 0); // {1, 2, 3}
+    try testing.expect(try deque.deleteRight() == 3); // {1, 2}
 
-    try std.testing.expect(deque.size() == 2);
+    try testing.expect(deque.size() == 2);
 
     // Test error handling
     _ = try deque.deleteLeft();
     _ = try deque.deleteLeft();
-    try std.testing.expect(deque.isEmpty());
+    try testing.expect(deque.isEmpty());
+    try testing.expectError(error.EmptyQueue, try deque.deleteLeft());
 }

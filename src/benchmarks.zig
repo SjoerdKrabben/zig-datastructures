@@ -296,7 +296,7 @@ pub fn stckBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 }
 
 pub fn dqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
-    var deque = dque.Deque(u16).init(allocator);
+    var deque = try dque.Deque(u16).init(allocator);
     defer deque.deinit();
     var total_elapsed: u64 = 0;
 
@@ -304,12 +304,11 @@ pub fn dqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 
     for (0..repeat) |i| {
         while (true) {
-            const item = deque.deleteRight();
-
-            if (item == error.EmptyQueue) {
+            if (deque.deleteRight() catch |err| err == error.EmptyQueue) {
                 break;
             }
         }
+
         if (i == 0) {
             try printMessage("Warming up...");
         } else {
@@ -341,6 +340,140 @@ pub fn dqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     return result;
 }
 
+pub fn dqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
+    var deque = try dque.Deque(f128).init(allocator);
+    defer deque.deinit();
+    var total_elapsed: u64 = 0;
+
+    try printMessage("Benchmark 1: Load 8001 f128 into Deque");
+
+    for (0..repeat) |i| {
+        while (true) {
+            if (deque.deleteRight() catch |err| err == error.EmptyQueue) {
+                break;
+            }
+        }
+
+        if (i == 0) {
+            try printMessage("Warming up...");
+        } else {
+            try printMessage("Starting timer...");
+        }
+
+        var timer = try Timer.start();
+
+        for (data.lijst_float_8001) |item| {
+            try deque.insertRight(item);
+        }
+
+        const elapsed = timer.read();
+
+        if (i > 0) {
+            total_elapsed += elapsed;
+        }
+
+        std.debug.assert(deque.size() == data.lijst_float_8001.len);
+        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
+    }
+    const average_time = total_elapsed / (repeat - 1);
+
+    try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in deque: {}\n", .{ average_time, deque.size() });
+
+    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t", try formatToString(average_time), "ns \n" });
+
+    try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
+    return result;
+}
+
+pub fn pqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
+    var prioque = try pque.PriorityQueue(u16).init(allocator);
+    defer prioque.deinit();
+    var total_elapsed: u64 = 0;
+
+    try printMessage("Benchmark 1: Load 10000 u16 into PriorityQueue");
+
+    for (0..repeat) |i| {
+        while (true) {
+            if (prioque.poll() catch |err| err == error.EmptyQueue) {
+                break;
+            }
+        }
+
+        if (i == 0) {
+            try printMessage("Warming up...");
+        } else {
+            try printMessage("Starting timer...");
+        }
+
+        var timer = try Timer.start();
+
+        for (data.lijst_willekeurig_10000) |item| {
+            try prioque.add(item);
+        }
+
+        const elapsed = timer.read();
+
+        if (i > 0) {
+            total_elapsed += elapsed;
+        }
+
+        std.debug.assert(prioque.size() == data.lijst_willekeurig_10000.len);
+        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
+    }
+    const average_time = total_elapsed / (repeat - 1);
+
+    try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in PriorityQueue: {}\n", .{ average_time, prioque.size() });
+
+    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try formatToString(average_time), "ns \n" });
+
+    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
+    return result;
+}
+
+pub fn pqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
+    var prioque = try pque.PriorityQueue(f128).init(allocator);
+    defer prioque.deinit();
+    var total_elapsed: u64 = 0;
+
+    try printMessage("Benchmark 1: Load 8001 f128 into Deque");
+
+    for (0..repeat) |i| {
+        while (true) {
+            if (prioque.poll() catch |err| err == error.EmptyQueue) {
+                break;
+            }
+        }
+
+        if (i == 0) {
+            try printMessage("Warming up...");
+        } else {
+            try printMessage("Starting timer...");
+        }
+
+        var timer = try Timer.start();
+
+        for (data.lijst_float_8001) |item| {
+            try prioque.add(item);
+        }
+
+        const elapsed = timer.read();
+
+        if (i > 0) {
+            total_elapsed += elapsed;
+        }
+
+        std.debug.assert(prioque.size() == data.lijst_float_8001.len);
+        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
+    }
+    const average_time = total_elapsed / (repeat - 1);
+
+    try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in PriorityQueue: {}\n", .{ average_time, prioque.size() });
+
+    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t", try formatToString(average_time), "ns \n" });
+
+    try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
+    return result;
+}
 pub fn bsrcBenchmark1(data: jsonDataset.Dataset_sorteren) ![]const u8 {
     try printMessage("Benchmark 1: Find random number in lijst_oplopend_10000");
     const rand = std.crypto.random;
