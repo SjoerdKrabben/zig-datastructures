@@ -56,13 +56,10 @@ pub fn DynamicList(comptime T: type) type {
                 @panic("Index out of bounds");
             }
 
-            var i: usize = position;
-            while (i < self.length - 1) : (i += 1) {
+            for (position..self.length - 1) |i| {
                 self.items[i] = self.items[i + 1];
             }
 
-            self.items = self.items[0 .. self.length - 1];
-            self.capacity -= 1;
             self.length -= 1;
         }
 
@@ -84,11 +81,17 @@ pub fn DynamicList(comptime T: type) type {
             return -1;
         }
 
-        pub fn get(self: Self, i: usize) T {
-            return self.items[i];
+        pub fn get(self: Self, position: usize) T {
+            if (position >= self.length) {
+                @panic("Index out of bounds");
+            }
+            return self.items[position];
         }
 
         pub fn set(self: Self, position: u8, item: T) void {
+            if (position >= self.length) {
+                @panic("Index out of bounds");
+            }
             self.items[position] = item;
         }
 
@@ -129,9 +132,9 @@ test "compareStructs" {
     try list.add(pietje);
     try list.add(jan);
 
-    print("list constains jan: {}\n", .{list.contains(jan)});
-    print("list contains pietje: {}\n", .{list.contains(pietje)});
-    print("list contains pieter: {}\n", .{list.contains(pieter)});
+    try testing.expect(list.contains(jan) == true);
+    try testing.expect(list.contains(pietje) == true);
+    try testing.expect(list.contains(pieter) == false);
 }
 
 test "DynamicList operations" {
