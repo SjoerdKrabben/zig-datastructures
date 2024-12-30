@@ -81,14 +81,14 @@ pub fn DynamicList(comptime T: type) type {
             return -1;
         }
 
-        pub fn get(self: Self, position: usize) T {
+        pub fn get(self: *Self, position: usize) T {
             if (position >= self.length) {
                 @panic("Index out of bounds");
             }
             return self.items[position];
         }
 
-        pub fn set(self: Self, position: u8, item: T) void {
+        pub fn set(self: *Self, position: u8, item: T) void {
             if (position >= self.length) {
                 @panic("Index out of bounds");
             }
@@ -99,6 +99,41 @@ pub fn DynamicList(comptime T: type) type {
             self.length = 0;
         }
     };
+}
+
+test "DynamicList operations" {
+    const allocator = std.heap.page_allocator;
+
+    var list = try DynamicList(i32).init(allocator);
+
+    defer list.deinit();
+
+    try list.add(10);
+    try list.add(20);
+    try list.add(30);
+
+    try testing.expect(list.length == 3);
+    try testing.expect(list.capacity >= list.length);
+
+    try testing.expect(list.get(0) == 10);
+    try testing.expect(list.get(1) == 20);
+    try testing.expect(list.get(2) == 30);
+
+    try list.remove(1);
+    try testing.expect(list.length == 2);
+    try testing.expect(list.get(0) == 10);
+    try testing.expect(list.get(1) == 30);
+
+    try testing.expect(list.contains(10));
+    try testing.expect(!list.contains(20));
+    try testing.expect(list.contains(30));
+
+    try testing.expect(list.indexOf(10) == 0);
+    try testing.expect(list.indexOf(30) == 1);
+    try testing.expect(list.indexOf(20) == -1);
+
+    list.set(1, 40);
+    try testing.expect(list.get(1) == 40);
 }
 
 test "createListAndTestFunctionsWithNumbers" {
@@ -135,39 +170,4 @@ test "compareStructs" {
     try testing.expect(list.contains(jan) == true);
     try testing.expect(list.contains(pietje) == true);
     try testing.expect(list.contains(pieter) == false);
-}
-
-test "DynamicList operations" {
-    const allocator = std.heap.page_allocator;
-
-    var list = try DynamicList(i32).init(allocator);
-
-    defer list.deinit();
-
-    try list.add(10);
-    try list.add(20);
-    try list.add(30);
-
-    try testing.expect(list.length == 3);
-    try testing.expect(list.capacity >= list.length);
-
-    try testing.expect(list.get(0) == 10);
-    try testing.expect(list.get(1) == 20);
-    try testing.expect(list.get(2) == 30);
-
-    try list.remove(1);
-    try testing.expect(list.length == 2);
-    try testing.expect(list.get(0) == 10);
-    try testing.expect(list.get(1) == 30);
-
-    try testing.expect(list.contains(10));
-    try testing.expect(!list.contains(20));
-    try testing.expect(list.contains(30));
-
-    try testing.expect(list.indexOf(10) == 0);
-    try testing.expect(list.indexOf(30) == 1);
-    try testing.expect(list.indexOf(20) == -1);
-
-    list.set(1, 40);
-    try testing.expect(list.get(1) == 40);
 }

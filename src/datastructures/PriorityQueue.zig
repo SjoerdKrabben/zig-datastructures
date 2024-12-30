@@ -55,25 +55,49 @@ pub fn PriorityQueue(comptime T: type) type {
     };
 }
 
-test "PriorityQueue operations" {
-    const allocator = std.heap.page_allocator;
-    var queue = try PriorityQueue(i32).init(allocator);
+test "PriorityQueue Operations" {
+    const allocator = std.testing.allocator;
 
-    defer queue.deinit();
+    var prioque = try PriorityQueue(u16).init(allocator);
+    defer prioque.deinit();
 
-    try queue.add(10);
-    try queue.add(5);
-    try queue.add(20);
+    try testing.expect(prioque.size() == 0);
 
-    // Test peek
-    //assert(try queue.peek() == 20);
+    try prioque.add(10);
+    try prioque.add(20);
+    try prioque.add(15);
 
-    // Test poll
-    assert(try queue.poll() == 20);
-    assert(try queue.peek() == 10);
+    try testing.expect(prioque.size() == 3);
 
-    // Test empty queue
-    _ = try queue.poll();
-    _ = try queue.poll();
-    try std.testing.expectError(error.EmptyQueue, queue.poll());
+    const peeked = try prioque.peek();
+    try testing.expect(peeked == 10);
+
+    const polled = try prioque.poll();
+    try testing.expect(polled == 10);
+
+    try testing.expect(prioque.size() == 2);
+
+    const peeked_after_poll = try prioque.peek();
+    try testing.expect(peeked_after_poll == 15);
+
+    const second_polled = try prioque.poll();
+    try testing.expect(second_polled == 15);
+
+    const third_polled = try prioque.poll();
+    try testing.expect(third_polled == 20);
+
+    try testing.expect(prioque.size() == 0);
+
+    try testing.expect(prioque.poll() catch |err| err == error.EmptyQueue);
+}
+
+test "PriorityQueue werkt met lege queue" {
+    const allocator = std.testing.allocator;
+
+    var prioque = try PriorityQueue(u16).init(allocator);
+    defer prioque.deinit();
+
+    try testing.expect(prioque.peek() catch |err| err == error.EmptyQueue);
+
+    try testing.expect(prioque.poll() catch |err| err == error.EmptyQueue);
 }
