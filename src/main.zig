@@ -1,6 +1,8 @@
 const std = @import("std");
 const jsonDataset = @import("json_parser.zig");
 const bm = @import("benchmarks.zig");
+const selsrt = @import("datastructures/SelectionSort.zig");
+const insrt = @import("datastructures/InsertionSort.zig");
 const meta = std.meta;
 const allocator = std.heap.page_allocator;
 const print = std.debug.print;
@@ -10,41 +12,41 @@ var selection: u8 = 0;
 const TOTALRUNS = 15;
 
 pub fn main() !void {
-    const testData = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
-    const options = [14][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Insertion Sort", "8: Selection Sort", "9: Quicksort", "10: Parallel-Merge Sort", "11: Hashtable", "12: Graph", "13: Dijkstra", "14: AVL-Searchtree" };
+    const dataset_sorteren = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
+    const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Parallel-Merge Sort", "9: Hashtable", "10: Graph", "11: Dijkstra", "12: AVL-Searchtree" };
 
     while (true) {
         switch (selection) {
             0 => {
-                selection = try showMain(options[0..]);
+                selection = try showMain(options);
                 continue;
             },
             1 => {
-                selection = try benchmarkDynamicList(testData);
+                selection = try benchmarkDynamicList(dataset_sorteren);
                 continue;
             },
             2 => {
-                selection = try benchmarkDoublyLinkedList(testData);
+                selection = try benchmarkDoublyLinkedList(dataset_sorteren);
                 continue;
             },
             3 => {
-                selection = try benchmarkStack(testData);
+                selection = try benchmarkStack(dataset_sorteren);
                 continue;
             },
             4 => {
-                selection = try benchmarkDeque(testData);
+                selection = try benchmarkDeque(dataset_sorteren);
                 continue;
             },
             5 => {
-                selection = try benchmarkPriorityQueue(testData);
+                selection = try benchmarkPriorityQueue(dataset_sorteren);
                 continue;
             },
             6 => {
-                selection = try benchmarkBinarySearch(testData);
+                selection = try benchmarkBinarySearch(dataset_sorteren);
                 continue;
             },
             7 => {
-                selection = 10;
+                selection = try benchmarkSortingAlgoritms(dataset_sorteren);
                 continue;
             },
             8 => {
@@ -65,7 +67,7 @@ pub fn main() !void {
     }
 }
 
-fn showMain(opts: *const [14][]const u8) !u8 {
+fn showMain(opts: [12][]const u8) !u8 {
     const stdin = std.io.getStdIn().reader();
     var inputBuffer: [10]u8 = undefined;
     var returnValue: u8 = 0;
@@ -187,6 +189,22 @@ fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
     results[0] = try bm.bsrcBenchmark1(data);
 
     try printMessage("\nBinarySearch Benchmarks finished!");
+
+    for (results) |r| {
+        try std.io.getStdOut().writer().print("{s}", .{r});
+    }
+
+    return 0;
+}
+
+fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !u8 {
+    try printMessage("Sorting Benchmarks Starting...");
+    var results = [_][]const u8{""};
+
+    results[0] = try bm.sortLijstWillekeurigBenchmark(selsrt.selectionSort, data, TOTALRUNS);
+    results[0] = std.mem.concat(allocator, "1. SelectionSort ", results[0]);
+
+    try printMessage("\nSorting Benchmarks finished!");
 
     for (results) |r| {
         try std.io.getStdOut().writer().print("{s}", .{r});
