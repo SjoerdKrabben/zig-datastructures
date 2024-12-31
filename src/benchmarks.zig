@@ -1,4 +1,5 @@
 const std = @import("std");
+const util = @import("functions.zig");
 const jsonDataset = @import("json_parser.zig");
 const dl = @import("datastructures/DynamicList.zig");
 const dll = @import("datastructures/DoublyLinkedList.zig");
@@ -22,15 +23,15 @@ pub fn dlBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const 
     defer list.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Load 10000 u16 into DynamicList");
+    try util.printMessage("Benchmark 1: Load 10000 u16 into DynamicList");
 
     for (0..repeat) |i| {
         list.clear();
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -52,7 +53,7 @@ pub fn dlBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const 
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;
@@ -63,15 +64,15 @@ pub fn dlBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const 
     defer list.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 2: Load 8001 f128 into DynamicList");
+    try util.printMessage("Benchmark 2: Load 8001 f128 into DynamicList");
 
     for (0..repeat) |i| {
         list.clear();
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -93,7 +94,7 @@ pub fn dlBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const 
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t\t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t\t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
 
@@ -105,7 +106,7 @@ pub fn dllBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
     var list = L{};
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Load 10000 u16 into DoublyLinkedList");
+    try util.printMessage("Benchmark 1: Load 10000 u16 into DoublyLinkedList");
 
     for (0..repeat) |i| {
         while (true) {
@@ -117,9 +118,9 @@ pub fn dllBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
         }
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -144,7 +145,7 @@ pub fn dllBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.len });
 
-    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
 
@@ -152,12 +153,12 @@ pub fn dllBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
 }
 
 pub fn dllBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
-    try printMessage("DoublyLinkedList LOADING");
+    try util.printMessage("DoublyLinkedList LOADING");
     const L = dll.DoublyLinkedList(f128);
     var list = L{};
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 2: Load 8001: f128 into DoublyLinkedList");
+    try util.printMessage("Benchmark 2: Load 8001: f128 into DoublyLinkedList");
 
     for (0..repeat) |i| {
         while (true) {
@@ -169,9 +170,9 @@ pub fn dllBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
         }
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -196,7 +197,7 @@ pub fn dllBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.len });
 
-    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t\t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t\t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
 
@@ -208,7 +209,7 @@ pub fn stckBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     defer stack.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Load 10000 u16 into Stack");
+    try util.printMessage("Benchmark 1: Load 10000 u16 into Stack");
 
     for (0..repeat) |i| {
         while (true) {
@@ -219,9 +220,9 @@ pub fn stckBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
             }
         }
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -243,7 +244,7 @@ pub fn stckBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in stack: {}\n", .{ average_time, stack.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;
@@ -254,7 +255,7 @@ pub fn stckBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     defer stack.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 2: Load 8001 f128 into Stack");
+    try util.printMessage("Benchmark 2: Load 8001 f128 into Stack");
 
     for (0..repeat) |i| {
         while (true) {
@@ -265,9 +266,9 @@ pub fn stckBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
             }
         }
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -289,7 +290,7 @@ pub fn stckBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in stack: {}\n", .{ average_time, stack.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t\t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t\t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
     return result;
@@ -300,7 +301,7 @@ pub fn dqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     defer deque.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Load 10000 u16 into Deque");
+    try util.printMessage("Benchmark 1: Load 10000 u16 into Deque");
 
     for (0..repeat) |i| {
         while (true) {
@@ -310,9 +311,9 @@ pub fn dqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         }
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -334,7 +335,7 @@ pub fn dqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in deque: {}\n", .{ average_time, deque.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;
@@ -345,7 +346,7 @@ pub fn dqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     defer deque.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Load 8001 f128 into Deque");
+    try util.printMessage("Benchmark 1: Load 8001 f128 into Deque");
 
     for (0..repeat) |i| {
         while (true) {
@@ -355,9 +356,9 @@ pub fn dqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         }
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -379,7 +380,7 @@ pub fn dqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in deque: {}\n", .{ average_time, deque.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
     return result;
@@ -390,7 +391,7 @@ pub fn pqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     defer prioque.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Load 10000 u16 into PriorityQueue");
+    try util.printMessage("Benchmark 1: Load 10000 u16 into PriorityQueue");
 
     for (0..repeat) |i| {
         while (true) {
@@ -400,9 +401,9 @@ pub fn pqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         }
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -424,7 +425,7 @@ pub fn pqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in PriorityQueue: {}\n", .{ average_time, prioque.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "1. Load 10000 integers: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;
@@ -435,7 +436,7 @@ pub fn pqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     defer prioque.deinit();
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Load 8001 f128 into Deque");
+    try util.printMessage("Benchmark 1: Load 8001 f128 into Deque");
 
     for (0..repeat) |i| {
         while (true) {
@@ -445,9 +446,9 @@ pub fn pqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         }
 
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
@@ -469,26 +470,26 @@ pub fn pqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in PriorityQueue: {}\n", .{ average_time, prioque.size() });
 
-    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ "2. Load 8001 floats: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
     return result;
 }
 
 pub fn bsrcBenchmark1(data: jsonDataset.Dataset_sorteren) ![]const u8 {
-    try printMessage("Benchmark 1: Find random number in lijst_oplopend_10000");
+    try util.printMessage("Benchmark 1: Find random number in lijst_oplopend_10000");
     const rand = std.crypto.random;
     const number = rand.intRangeAtMost(i32, 0, 10000);
 
-    try printMessage("Starting timer...");
+    try util.printMessage("Starting timer...");
     var timer = try Timer.start();
 
     const hasNumber = bsrc.binarySearch(data.lijst_oplopend_10000, 0, data.lijst_oplopend_10000.len - 1, number);
 
-    try printMessage("BinarySearch finished!");
+    try util.printMessage("BinarySearch finished!");
 
     const elapsed = timer.read();
-    try printMessage("Benchmark 1 finished!");
+    try util.printMessage("Benchmark 1 finished!");
     try std.io.getStdOut().writer().print("Time passed: {}ns. Items in list: {}\n", .{ elapsed, data.lijst_oplopend_10000.len });
 
     if (hasNumber > -1) {
@@ -502,21 +503,22 @@ pub fn bsrcBenchmark1(data: jsonDataset.Dataset_sorteren) ![]const u8 {
     return result;
 }
 
-pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) []u16, data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
+pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) void, data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
     var total_elapsed: u64 = 0;
 
-    try printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
+    try util.printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
 
     for (0..repeat) |i| {
         if (i == 0) {
-            try printMessage("Warming up...");
+            try util.printMessage("Warming up...");
         } else {
-            try printMessage("Starting timer...");
+            try util.printMessage("Starting timer...");
         }
 
         var timer = try Timer.start();
 
-        const sortedList = sort(data.lijst_willekeurig_10000);
+        const sortedList = data.lijst_oplopend_10000;
+        sort(data.lijst_willekeurig_10000);
 
         const elapsed = timer.read();
 
@@ -524,30 +526,15 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) []u16, data: jsonDataset.D
             total_elapsed += elapsed;
         }
 
-        std.debug.assert(sortedList.size() == data.lijst_willekeurig_10000.len);
+        std.debug.assert(sortedList.len == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
     const average_time = total_elapsed / (repeat - 1);
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
 
-    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;
-}
-
-fn formatToString(input: u64) ![]u8 {
-    var buffer: [64]u8 = undefined;
-
-    const slice = std.fmt.bufPrintIntToSlice(&buffer, @as(u64, input), 10, .lower, .{});
-    const result = try allocator.dupe(u8, slice);
-
-    return result;
-}
-
-fn printMessage(message: []const u8) !void {
-    const stdout = std.io.getStdOut().writer();
-
-    try stdout.print("{s}\n", .{message});
 }
