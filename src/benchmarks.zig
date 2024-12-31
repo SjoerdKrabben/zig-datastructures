@@ -538,3 +538,39 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) void, data: jsonDataset.Da
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;
 }
+
+pub fn quicksortLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void, data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
+    var total_elapsed: u64 = 0;
+
+    try util.printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
+
+    for (0..repeat) |i| {
+        if (i == 0) {
+            try util.printMessage("Warming up...");
+        } else {
+            try util.printMessage("Starting timer...");
+        }
+
+        var timer = try Timer.start();
+
+        const sortedList = data.lijst_oplopend_10000;
+        sort(data.lijst_willekeurig_10000, 0, data.lijst_willekeurig_10000.len - 1);
+
+        const elapsed = timer.read();
+
+        if (i > 0) {
+            total_elapsed += elapsed;
+        }
+
+        std.debug.assert(sortedList.len == data.lijst_willekeurig_10000.len);
+        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
+    }
+    const average_time = total_elapsed / (repeat - 1);
+
+    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
+
+    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try util.formatToString(average_time), "ns \n" });
+
+    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
+    return result;
+}

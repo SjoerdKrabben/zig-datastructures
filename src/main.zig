@@ -217,6 +217,13 @@ fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !u8 {
             else => results[0] = "SelectionSort Failed!",
         }
     }
+    if (bm.quicksortLijstWillekeurigBenchmark(sort.quickSort, data, TOTALRUNS)) |result| {
+        results[0] = try std.fmt.allocPrint(allocator, "3. QuickSort => {s}\n", .{result});
+    } else |err| {
+        switch (err) {
+            else => results[0] = "QuickSort Failed!",
+        }
+    }
 
     try util.printMessage("\nSorting Benchmarks finished!");
 
