@@ -2,6 +2,7 @@ const std = @import("std");
 const debug = std.debug;
 const assert = debug.assert;
 const testing = std.testing;
+const Allocator = std.mem.Allocator;
 
 const print = std.debug.print;
 
@@ -75,6 +76,62 @@ pub fn Sort(comptime T: type) type {
             a.* = b.*;
             b.* = temp;
         }
+
+        pub fn mergeSort(array: []T, left: usize, right: usize) void {
+            if (left < right) {
+                const mid: usize = left + (right - left) / 2;
+
+                mergeSort(array, left, mid);
+                mergeSort(array, mid + 1, right);
+
+                merge(array, left, mid, right) catch |err| print("Merge failed: {}", .{err});
+            }
+        }
+
+        fn merge(array: []T, left: usize, mid: usize, right: usize) Allocator.Error!void {
+            const allocator: Allocator = std.heap.page_allocator;
+            const n1 = mid - left + 1;
+            const n2 = right - mid;
+
+            var L: []T = try allocator.alloc(T, n1);
+            defer allocator.free(L);
+
+            var R: []T = try allocator.alloc(T, n2);
+            defer allocator.free(R);
+
+            for (0..n1) |i| {
+                L[i] = array[left + i];
+            }
+            for (0..n2) |i| {
+                R[i] = array[mid + 1 + i];
+            }
+
+            var i: usize = 0;
+            var j: usize = 0;
+            var k: usize = left;
+            while (i < n1 and j < n2) {
+                if (L[i] <= R[j]) {
+                    array[k] = L[i];
+                    i += 1;
+                } else {
+                    array[k] = R[j];
+                    j += 1;
+                }
+                k += 1;
+            }
+
+            while (i < n1) {
+                array[k] = L[i];
+                i += 1;
+                k += 1;
+            }
+
+            while (j < n2) {
+                array[k] = R[j];
+                j += 1;
+                k += 1;
+            }
+        }
     };
 }
 
@@ -103,6 +160,16 @@ test "quicksort sorts integer array" {
     var arr = [6]i32{ 5, 2, 9, 1, 5, 6 };
 
     sorter.quickSort(arr[0..], 0, arr.len - 1);
+
+    const expected = [_]i32{ 1, 2, 5, 5, 6, 9 };
+    try std.testing.expectEqualSlices(i32, expected[0..], arr[0..]);
+}
+
+test "parallel mergesort sorts integer array" {
+    const sorter = Sort(i32);
+    var arr = [6]i32{ 5, 2, 9, 1, 5, 6 };
+
+    try sorter.mergeSort(arr[0..], 0, arr.len - 1);
 
     const expected = [_]i32{ 1, 2, 5, 5, 6, 9 };
     try std.testing.expectEqualSlices(i32, expected[0..], arr[0..]);
@@ -138,6 +205,16 @@ test "quicksort sorts float array" {
     try std.testing.expectEqualSlices(f32, expected[0..], arr[0..]);
 }
 
+test "parallel mergesort sorts float array" {
+    const sorter = Sort(f32);
+    var arr = [_]f32{ 5.5, 2.2, 9.9, 1.1, 5.5, 6.6 };
+
+    try sorter.mergeSort(arr[0..], 0, arr.len - 1);
+
+    const expected = [_]f32{ 1.1, 2.2, 5.5, 5.5, 6.6, 9.9 };
+    try std.testing.expectEqualSlices(f32, expected[0..], arr[0..]);
+}
+
 test "insertionSort works with empty array" {
     const sorter = Sort(i32);
     var arr: [0]i32 = [_]i32{};
@@ -168,23 +245,12 @@ test "quicksort works with empty array" {
     try std.testing.expectEqualSlices(i32, expected[0..], arr[0..]);
 }
 
-// test "parallel mergesort sorts integer array" {
-//     var arr = [_]i32{ 5, 2, 9, 1, 5, 6 };
-//     parallel_mergesort(i32, arr[0..]);
-//     const expected = [_]i32{ 1, 2, 5, 5, 6, 9 };
-//     try std.testing.expectEqualSlices(expected[0..], arr[0..]);
-// }
-//
-// test "parallel mergesort sorts float array" {
-//     var arr = [_]f32{ 5.5, 2.2, 9.9, 1.1, 5.5, 6.6 };
-//     parallel_mergesort(f32, arr[0..]);
-//     const expected = [_]f32{ 1.1, 2.2, 5.5, 5.5, 6.6, 9.9 };
-//     try std.testing.expectEqualSlices(expected[0..], arr[0..]);
-// }
-//
-// test "parallel mergesort works with empty array" {
-//     var arr = []i32{};
-//     parallel_mergesort(i32, arr);
-//     const expected = []i32{};
-//     try std.testing.expectEqualSlices(expected, arr);
-// }
+test "parallel mergesort works with empty array" {
+    const sorter = Sort(i32);
+    var arr: [0]i32 = [_]i32{};
+
+    try sorter.mergeSort(arr[0..], 0, arr.len);
+
+    const expected: [0]i32 = [_]i32{};
+    try std.testing.expectEqualSlices(i32, expected[0..], arr[0..]);
+}

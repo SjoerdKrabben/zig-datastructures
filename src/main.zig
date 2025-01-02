@@ -13,7 +13,7 @@ const TOTALRUNS = 10;
 
 pub fn main() !void {
     const dataset_sorteren = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
-    const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Parallel-Merge Sort", "9: Hashtable", "10: Graph", "11: Dijkstra", "12: AVL-Searchtree" };
+    const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Hashtable", "9: Graph", "10: Dijkstra", "11: AVL-Searchtree" };
 
     while (true) {
         switch (selection) {
@@ -67,9 +67,9 @@ pub fn main() !void {
     }
 }
 
-fn showMain(opts: [12][]const u8) !u8 {
+fn showMain(opts: [11][]const u8) !u8 {
     const stdin = std.io.getStdIn().reader();
-    var inputBuffer: [10]u8 = undefined;
+    var inputBuffer: [9]u8 = undefined;
     var returnValue: u8 = 0;
 
     try util.printMessage("");
@@ -199,29 +199,36 @@ fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
 
 fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !u8 {
     try util.printMessage("Sorting Benchmarks Starting...");
-    var results = [_][]const u8{""};
+    var results = [_][]const u8{ "", "", "", "" };
 
     const sort = srt.Sort(u16);
 
     if (bm.sortLijstWillekeurigBenchmark(sort.selectionSort, data, TOTALRUNS)) |result| {
-        results[0] = try std.fmt.allocPrint(allocator, "1. SelectionSort => {s}\n", .{result});
+        results[0] = try std.fmt.allocPrint(allocator, "1. SelectionSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
             else => results[0] = "SelectionSort Failed!",
         }
     }
     if (bm.sortLijstWillekeurigBenchmark(sort.insertionSort, data, TOTALRUNS)) |result| {
-        results[0] = try std.fmt.allocPrint(allocator, "2. InsertionSort => {s}\n", .{result});
+        results[1] = try std.fmt.allocPrint(allocator, "2. InsertionSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
-            else => results[0] = "SelectionSort Failed!",
+            else => results[1] = "SelectionSort Failed!",
         }
     }
     if (bm.quicksortLijstWillekeurigBenchmark(sort.quickSort, data, TOTALRUNS)) |result| {
-        results[0] = try std.fmt.allocPrint(allocator, "3. QuickSort => {s}\n", .{result});
+        results[2] = try std.fmt.allocPrint(allocator, "3. QuickSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
-            else => results[0] = "QuickSort Failed!",
+            else => results[2] = "QuickSort Failed!",
+        }
+    }
+    if (bm.quicksortLijstWillekeurigBenchmark(sort.mergeSort, data, TOTALRUNS)) |result| {
+        results[3] = try std.fmt.allocPrint(allocator, "4. Parallel-MergeSort => \t{s}\n", .{result});
+    } else |err| {
+        switch (err) {
+            else => results[3] = "Parallel-MergeSort Failed!",
         }
     }
 
