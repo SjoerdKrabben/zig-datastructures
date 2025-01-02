@@ -7,8 +7,6 @@ const stck = @import("datastructures/Stack.zig");
 const dque = @import("datastructures/DoubleEndedQueue.zig");
 const pque = @import("datastructures/PriorityQueue.zig");
 const bsrc = @import("datastructures/BinarySearch.zig");
-const insrt = @import("datastructures/InsertionSort.zig");
-const selsrt = @import("datastructures/SelectionSort.zig");
 
 const meta = std.meta;
 const allocator = std.heap.page_allocator;
@@ -49,7 +47,12 @@ pub fn dlBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const 
         std.debug.assert(list.size() == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.size() });
 
@@ -90,7 +93,12 @@ pub fn dlBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const 
         std.debug.assert(list.size() == data.lijst_float_8001.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.size() });
 
@@ -141,7 +149,12 @@ pub fn dllBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
         std.debug.assert(list.len == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.len });
 
@@ -193,7 +206,12 @@ pub fn dllBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const
         std.debug.assert(list.len == data.lijst_float_8001.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in list: {}\n", .{ average_time, list.len });
 
@@ -240,7 +258,12 @@ pub fn stckBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         std.debug.assert(stack.size() == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in stack: {}\n", .{ average_time, stack.size() });
 
@@ -286,7 +309,12 @@ pub fn stckBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         std.debug.assert(stack.size() == data.lijst_float_8001.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in stack: {}\n", .{ average_time, stack.size() });
 
@@ -331,7 +359,12 @@ pub fn dqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         std.debug.assert(deque.size() == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in deque: {}\n", .{ average_time, deque.size() });
 
@@ -376,7 +409,12 @@ pub fn dqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         std.debug.assert(deque.size() == data.lijst_float_8001.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in deque: {}\n", .{ average_time, deque.size() });
 
@@ -421,7 +459,12 @@ pub fn pqueBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         std.debug.assert(prioque.size() == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in PriorityQueue: {}\n", .{ average_time, prioque.size() });
 
@@ -466,7 +509,12 @@ pub fn pqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
         std.debug.assert(prioque.size() == data.lijst_float_8001.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns. Items in PriorityQueue: {}\n", .{ average_time, prioque.size() });
 
@@ -529,7 +577,12 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) void, data: jsonDataset.Da
         std.debug.assert(sortedList.len == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
 
@@ -539,7 +592,7 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) void, data: jsonDataset.Da
     return result;
 }
 
-pub fn quicksortLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void, data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
+pub fn sortLowHighLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void, data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
     var total_elapsed: u64 = 0;
 
     try util.printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
@@ -565,7 +618,58 @@ pub fn quicksortLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void, d
         std.debug.assert(sortedList.len == data.lijst_willekeurig_10000.len);
         try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
-    const average_time = total_elapsed / (repeat - 1);
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
+
+    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
+
+    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try util.formatToString(average_time), "ns \n" });
+
+    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
+    return result;
+}
+
+pub fn sortLowHighMillionRandom(sort: fn ([]u32, usize, usize) void, repeat: usize) ![]const u8 {
+    var total_elapsed: u64 = 0;
+    var list: [1000000]u32 = undefined;
+
+    try util.printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
+
+    for (0..repeat) |i| {
+        if (i == 0) {
+            try util.printMessage("Warming up...");
+        } else {
+            try util.printMessage("Starting timer...");
+        }
+        for (0..1000000) |j| {
+            const rand = std.crypto.random;
+            const number = rand.intRangeAtMost(u32, 0, 1000000);
+
+            list[j] = number;
+        }
+
+        var timer = try Timer.start();
+
+        sort(&list, 0, list.len - 1);
+
+        const elapsed = timer.read();
+
+        if (i > 0) {
+            total_elapsed += elapsed;
+        }
+
+        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
+    }
+    var average_time: u64 = 0;
+    if (repeat > 1) {
+        average_time = total_elapsed / (repeat - 1);
+    } else {
+        average_time = total_elapsed;
+    }
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
 

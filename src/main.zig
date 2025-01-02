@@ -2,6 +2,7 @@ const std = @import("std");
 const jsonDataset = @import("json_parser.zig");
 const util = @import("functions.zig");
 const bm = @import("benchmarks.zig");
+const bms = @import("benchmarks_sorteren.zig");
 const srt = @import("datastructures/Sorting.zig");
 const meta = std.meta;
 const allocator = std.heap.page_allocator;
@@ -9,7 +10,7 @@ const print = std.debug.print;
 const Timer = std.time.Timer;
 
 var selection: u8 = 0;
-const TOTALRUNS = 10;
+const TOTALRUNS = 5;
 
 pub fn main() !void {
     const dataset_sorteren = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
@@ -199,36 +200,74 @@ fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
 
 fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !u8 {
     try util.printMessage("Sorting Benchmarks Starting...");
-    var results = [_][]const u8{ "", "", "", "" };
+    //var results = [_][]const u8{ "", "", "", "", "", "", "", "", ""};
+    var results: [9][]const u8 = undefined;
 
     const sort = srt.Sort(u16);
 
-    if (bm.sortLijstWillekeurigBenchmark(sort.selectionSort, data, TOTALRUNS)) |result| {
-        results[0] = try std.fmt.allocPrint(allocator, "1. SelectionSort => \t\t{s}\n", .{result});
+    if (bms.sortLijstWillekeurigBenchmark(sort.insertionSort, data, TOTALRUNS)) |result| {
+        results[0] = try std.fmt.allocPrint(allocator, "2. InsertionSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
             else => results[0] = "SelectionSort Failed!",
         }
     }
-    if (bm.sortLijstWillekeurigBenchmark(sort.insertionSort, data, TOTALRUNS)) |result| {
-        results[1] = try std.fmt.allocPrint(allocator, "2. InsertionSort => \t\t{s}\n", .{result});
+    if (bms.sortLijstWillekeurigBenchmark(sort.selectionSort, data, TOTALRUNS)) |result| {
+        results[1] = try std.fmt.allocPrint(allocator, "1. SelectionSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
             else => results[1] = "SelectionSort Failed!",
         }
     }
-    if (bm.quicksortLijstWillekeurigBenchmark(sort.quickSort, data, TOTALRUNS)) |result| {
+
+    if (bms.sortLowHighLijstWillekeurigBenchmark(sort.quickSort, data, TOTALRUNS)) |result| {
         results[2] = try std.fmt.allocPrint(allocator, "3. QuickSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
             else => results[2] = "QuickSort Failed!",
         }
     }
-    if (bm.quicksortLijstWillekeurigBenchmark(sort.mergeSort, data, TOTALRUNS)) |result| {
+    if (bms.sortLowHighLijstWillekeurigBenchmark(sort.mergeSort, data, TOTALRUNS)) |result| {
         results[3] = try std.fmt.allocPrint(allocator, "4. Parallel-MergeSort => \t{s}\n", .{result});
     } else |err| {
         switch (err) {
             else => results[3] = "Parallel-MergeSort Failed!",
+        }
+    }
+
+    results[4] = "-----------------------------------\n\n";
+
+    const newSort = srt.Sort(u32);
+
+    if (bms.sort100000Random(newSort.insertionSort, TOTALRUNS)) |result| {
+        results[5] = try std.fmt.allocPrint(allocator, "5. InsertionSort => \t\t{s}\n", .{result});
+    } else |err| {
+        switch (err) {
+            else => results[5] = "InsertionSort Failed!",
+        }
+    }
+
+    if (bms.sort100000Random(newSort.selectionSort, TOTALRUNS)) |result| {
+        results[6] = try std.fmt.allocPrint(allocator, "6. SelectionSort => \t\t{s}\n", .{result});
+    } else |err| {
+        switch (err) {
+            else => results[6] = "SelectionSort Failed!",
+        }
+    }
+
+    if (bms.sortLowHigh100000Random(newSort.quickSort, TOTALRUNS)) |result| {
+        results[7] = try std.fmt.allocPrint(allocator, "7. QuickSort => \t\t{s}\n", .{result});
+    } else |err| {
+        switch (err) {
+            else => results[7] = "QuickSort Failed!",
+        }
+    }
+
+    if (bms.sortLowHigh100000Random(newSort.mergeSort, TOTALRUNS)) |result| {
+        results[8] = try std.fmt.allocPrint(allocator, "8. Parallel-MergeSort => \t{s}\n", .{result});
+    } else |err| {
+        switch (err) {
+            else => results[8] = "Parallel-MergeSort Failed!",
         }
     }
 
