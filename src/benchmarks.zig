@@ -524,39 +524,14 @@ pub fn pqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     return result;
 }
 
-pub fn bsrcBenchmark1(data: jsonDataset.Dataset_sorteren) ![]const u8 {
+pub fn bsrcBenchmark1(data: jsonDataset.Dataset_sorteren, repeat: u8) ![]const u8 {
     try util.printMessage("Benchmark 1: Find random number in lijst_oplopend_10000");
-    const rand = std.crypto.random;
-    const number = rand.intRangeAtMost(i32, 0, 10000);
-
-    try util.printMessage("Starting timer...");
-    var timer = try Timer.start();
-
-    const hasNumber = bsrc.binarySearch(data.lijst_oplopend_10000, 0, data.lijst_oplopend_10000.len - 1, number);
-
-    try util.printMessage("BinarySearch finished!");
-
-    const elapsed = timer.read();
-    try util.printMessage("Benchmark 1 finished!");
-    try std.io.getStdOut().writer().print("Time passed: {}ns. Items in list: {}\n", .{ elapsed, data.lijst_oplopend_10000.len });
-
-    if (hasNumber > -1) {
-        try std.io.getStdOut().writer().print("The array contains {}!\n", .{number});
-    } else {
-        try std.io.getStdOut().writer().print("Number {} not found!\n", .{number});
-    }
-
-    const result = std.fmt.allocPrint(allocator, "1. Number {} found in lijst_oplopend_10000", .{hasNumber});
-
-    return result;
-}
-
-pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) void, data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
     var total_elapsed: u64 = 0;
 
-    try util.printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
-
     for (0..repeat) |i| {
+        const rand = std.crypto.random;
+        const number = rand.intRangeAtMost(i32, 0, 10000);
+
         if (i == 0) {
             try util.printMessage("Warming up...");
         } else {
@@ -565,8 +540,7 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) void, data: jsonDataset.Da
 
         var timer = try Timer.start();
 
-        const sortedList = data.lijst_oplopend_10000;
-        sort(data.lijst_willekeurig_10000);
+        const hasNumber = bsrc.binarySearch(data.lijst_oplopend_10000, 0, data.lijst_oplopend_10000.len - 1, number);
 
         const elapsed = timer.read();
 
@@ -574,50 +548,15 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16) void, data: jsonDataset.Da
             total_elapsed += elapsed;
         }
 
-        std.debug.assert(sortedList.len == data.lijst_willekeurig_10000.len);
-        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
-    }
-    var average_time: u64 = 0;
-    if (repeat > 1) {
-        average_time = total_elapsed / (repeat - 1);
-    } else {
-        average_time = total_elapsed;
-    }
+        try util.printMessage("Benchmark 1 finished!");
 
-    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
-
-    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try util.formatToString(average_time), "ns \n" });
-
-    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
-    return result;
-}
-
-pub fn sortLowHighLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void, data: jsonDataset.Dataset_sorteren, repeat: usize) ![]const u8 {
-    var total_elapsed: u64 = 0;
-
-    try util.printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
-
-    for (0..repeat) |i| {
-        if (i == 0) {
-            try util.printMessage("Warming up...");
+        if (hasNumber > -1) {
+            try std.io.getStdOut().writer().print("Run {}, Time {}ns. The array contains {}!\n", .{ i + 1, elapsed, number });
         } else {
-            try util.printMessage("Starting timer...");
+            try std.io.getStdOut().writer().print("Run {}, Time {}ns. Number {} not found!\n", .{ i + 1, elapsed, number });
         }
-
-        var timer = try Timer.start();
-
-        const sortedList = data.lijst_oplopend_10000;
-        sort(data.lijst_willekeurig_10000, 0, data.lijst_willekeurig_10000.len - 1);
-
-        const elapsed = timer.read();
-
-        if (i > 0) {
-            total_elapsed += elapsed;
-        }
-
-        std.debug.assert(sortedList.len == data.lijst_willekeurig_10000.len);
-        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
+
     var average_time: u64 = 0;
     if (repeat > 1) {
         average_time = total_elapsed / (repeat - 1);
@@ -625,55 +564,9 @@ pub fn sortLowHighLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void,
         average_time = total_elapsed;
     }
 
-    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
+    const result = std.mem.concat(allocator, u8, &.{ "Find random number in lijst_oplopend_10000\t", try util.formatToString(average_time), "ns \n" });
 
-    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try util.formatToString(average_time), "ns \n" });
-
-    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
-    return result;
-}
-
-pub fn sortLowHighMillionRandom(sort: fn ([]u32, usize, usize) void, repeat: usize) ![]const u8 {
-    var total_elapsed: u64 = 0;
-    var list: [1000000]u32 = undefined;
-
-    try util.printMessage("Benchmark 1: Sorting lijst_willekeurig_10000");
-
-    for (0..repeat) |i| {
-        if (i == 0) {
-            try util.printMessage("Warming up...");
-        } else {
-            try util.printMessage("Starting timer...");
-        }
-        for (0..1000000) |j| {
-            const rand = std.crypto.random;
-            const number = rand.intRangeAtMost(u32, 0, 1000000);
-
-            list[j] = number;
-        }
-
-        var timer = try Timer.start();
-
-        sort(&list, 0, list.len - 1);
-
-        const elapsed = timer.read();
-
-        if (i > 0) {
-            total_elapsed += elapsed;
-        }
-
-        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
-    }
-    var average_time: u64 = 0;
-    if (repeat > 1) {
-        average_time = total_elapsed / (repeat - 1);
-    } else {
-        average_time = total_elapsed;
-    }
-
-    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
-
-    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try util.formatToString(average_time), "ns \n" });
+    try std.io.getStdOut().writer().print("Average Time passed: {}ns. Items in list: {}\n", .{ average_time, data.lijst_oplopend_10000.len });
 
     try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;

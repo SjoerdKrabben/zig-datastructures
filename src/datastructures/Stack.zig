@@ -32,10 +32,10 @@ pub fn Stack(comptime T: type) type {
         }
 
         pub fn push(self: *Self, new_item: T) Allocator.Error!void {
-            const node = try self.allocator.create(L.Node);
-            node.* = L.Node{ .data = new_item };
+            const new_node = try self.allocator.create(L.Node);
+            new_node.* = L.Node{ .data = new_item };
 
-            self.list.append(node);
+            self.list.append(new_node);
         }
 
         pub fn pop(self: *Self) !T {

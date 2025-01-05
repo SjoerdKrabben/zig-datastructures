@@ -15,8 +15,8 @@ const Test_dataset = struct {
     }
 };
 
-pub fn loadDataset(allocator: std.mem.Allocator, file_path: []const u8) !Dataset_sorteren {
-    const file = try std.fs.cwd().openFile(file_path, .{});
+pub fn loadDatasetSorteren(allocator: std.mem.Allocator) !Dataset_sorteren {
+    const file = try std.fs.cwd().openFile("assets/test_json.json", .{});
     defer file.close();
 
     const file_content = try file.readToEndAlloc(allocator, std.math.maxInt(usize));
@@ -51,3 +51,21 @@ fn allocateFieldsToHeap(allocator: std.mem.Allocator, source: Dataset_sorteren) 
 
     return result;
 }
+
+// pub fn loadDatasetHashen(allocator: std.mem.Allocator) !Dataset_hashen {
+//     const file = try std.fs.cwd().openFile("assets/dataset_hashen", .{});
+//     defer file.close();
+//
+//     const file_content = try file.readToEndAlloc(allocator, std.math.maxInt(usize));
+//     defer allocator.free(file_content);
+//
+//     const parsed = try std.json.parseFromSlice(Dataset_sorteren, allocator, file_content, .{});
+//     defer parsed.deinit();
+//
+//     const source: Dataset_sorteren = parsed.value;
+//     var dataset: Dataset_sorteren = undefined;
+//
+//     dataset = try allocateFieldsToHeap(allocator, source);
+//
+//     return dataset;
+// }

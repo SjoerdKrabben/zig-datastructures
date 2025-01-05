@@ -3,7 +3,9 @@ const jsonDataset = @import("json_parser.zig");
 const util = @import("functions.zig");
 const bm = @import("benchmarks.zig");
 const bms = @import("benchmarks_sorteren.zig");
+const bmh = @import("benchmarks_hashtable.zig");
 const srt = @import("datastructures/Sorting.zig");
+const htable = @import("datastructures/HashTableSeparateChaining.zig");
 const meta = std.meta;
 const allocator = std.heap.page_allocator;
 const print = std.debug.print;
@@ -13,7 +15,9 @@ var selection: u8 = 0;
 const TOTALRUNS = 5;
 
 pub fn main() !void {
-    const dataset_sorteren = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
+    const dataset_sorteren = try jsonDataset.loadDatasetSorteren(allocator);
+    // const dataset_hashen = try jsonDataset.loadDatasetHashen(allocator);
+
     const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Hashtable", "9: Graph", "10: Dijkstra", "11: AVL-Searchtree" };
 
     while (true) {
@@ -51,7 +55,7 @@ pub fn main() !void {
                 continue;
             },
             8 => {
-                selection = 10;
+                selection = try benchmarkHashmaps();
                 continue;
             },
             9 => {
@@ -187,7 +191,7 @@ fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
     try util.printMessage("BinarySearch test");
     var results = [_][]const u8{""};
 
-    results[0] = try bm.bsrcBenchmark1(data);
+    results[0] = try bm.bsrcBenchmark1(data, TOTALRUNS);
 
     try util.printMessage("\nBinarySearch Benchmarks finished!");
 
@@ -277,6 +281,17 @@ fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !u8 {
         try std.io.getStdOut().writer().print("{s}", .{r});
     }
 
+    return 0;
+}
+
+fn benchmarkHashmaps() !u8 {
+    try util.printMessage("Hashtable Benchmarks Starting...");
+    var results: [1][]const u8 = undefined;
+    const result = try bmh.insert100000RandomEntries(TOTALRUNS);
+
+    results[0] = try std.fmt.allocPrint(allocator, "Insert Random numbers => \t{any}\n", .{result});
+
+    try util.printMessage("\nHashTable Benchmarks finished!");
     return 0;
 }
 

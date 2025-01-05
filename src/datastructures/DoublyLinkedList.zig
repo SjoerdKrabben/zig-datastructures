@@ -102,7 +102,7 @@ pub fn DoublyLinkedList(comptime T: type) type {
     };
 }
 
-test "basic DoublyLinkedList test" {
+test "DoublyLinkedList Operations" {
     const L = DoublyLinkedList(u32);
     var list = L{};
 

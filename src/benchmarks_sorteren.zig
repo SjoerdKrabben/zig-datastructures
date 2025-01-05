@@ -98,7 +98,7 @@ pub fn sort100000Random(sort: fn ([]u32) void, repeat: usize) ![]const u8 {
     var total_elapsed: u64 = 0;
     var list: [100000]u32 = undefined;
 
-    try util.printMessage("Benchmark 2: Sorting One 100000 Random Numbers");
+    try util.printMessage("Benchmark 2: Sorting 100000 Random Numbers");
 
     for (0..repeat) |i| {
         if (i == 0) {
@@ -134,7 +134,7 @@ pub fn sort100000Random(sort: fn ([]u32) void, repeat: usize) ![]const u8 {
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
 
-    const result = std.mem.concat(allocator, u8, &.{ " One 100000 Random numbers: \t", try util.formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ " 100000 Random numbers: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
     return result;
@@ -144,7 +144,7 @@ pub fn sortLowHigh100000Random(sort: fn ([]u32, usize, usize) void, repeat: usiz
     var total_elapsed: u64 = 0;
     var list: [100000]u32 = undefined;
 
-    try util.printMessage("Benchmark 2: Sorting One 100000 Random Numbers");
+    try util.printMessage("Benchmark 2: Sorting 100000 Random Numbers");
 
     for (0..repeat) |i| {
         if (i == 0) {
@@ -180,7 +180,7 @@ pub fn sortLowHigh100000Random(sort: fn ([]u32, usize, usize) void, repeat: usiz
 
     try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
 
-    const result = std.mem.concat(allocator, u8, &.{ " One 100000 Random numbers: \t", try util.formatToString(average_time), "ns \n" });
+    const result = std.mem.concat(allocator, u8, &.{ " 100000 Random numbers: \t", try util.formatToString(average_time), "ns \n" });
 
     try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
     return result;
