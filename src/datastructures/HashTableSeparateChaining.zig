@@ -208,7 +208,6 @@ pub fn HashTableSeparateChaining(comptime T: type) type {
 }
 
 test "HashTableSeparateChaining operations" {
-    std.debug.print("\n\n HALLO BEN JE DAAR??? \n\n", .{});
     const allocator = testing.allocator;
     const capacity = 16;
 
