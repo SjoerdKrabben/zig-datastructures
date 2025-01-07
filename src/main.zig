@@ -6,8 +6,12 @@ const bms = @import("benchmarks_sorteren.zig");
 const bmh = @import("benchmarks_hashtable.zig");
 const srt = @import("datastructures/Sorting.zig");
 const htable = @import("datastructures/HashTableSeparateChaining.zig");
+const grp = @import("datastructures/Graph.zig");
+const dks = @import("datastructures/Dijkstra.zig");
 const meta = std.meta;
+const testing = std.testing;
 const allocator = std.heap.page_allocator;
+const assert = std.debug.assert;
 const print = std.debug.print;
 const Timer = std.time.Timer;
 
@@ -18,7 +22,7 @@ pub fn main() !void {
     const dataset_sorteren = try jsonDataset.loadDatasetSorteren(allocator);
     // const dataset_hashen = try jsonDataset.loadDatasetHashen(allocator);
 
-    const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Hashtable", "9: Graph", "10: Dijkstra", "11: AVL-Searchtree" };
+    const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Hashtable", "9: Dijkstra", "10: AVL-Searchtree" };
 
     while (true) {
         switch (selection) {
@@ -59,22 +63,25 @@ pub fn main() !void {
                 continue;
             },
             9 => {
-                selection = 10;
+                selection = try testDijkstraShowTranslationFromPDF();
                 continue;
             },
-
+            10 => {
+                selection = 0;
+                continue;
+            },
             else => {
                 try util.printMessage("Program terminated!");
-                selection = 10;
+                selection = 11;
                 break;
             },
         }
     }
 }
 
-fn showMain(opts: [11][]const u8) !u8 {
+fn showMain(opts: [10][]const u8) !u8 {
     const stdin = std.io.getStdIn().reader();
-    var inputBuffer: [9]u8 = undefined;
+    var inputBuffer: [10]u8 = undefined;
     var returnValue: u8 = 0;
 
     try util.printMessage("");
@@ -293,6 +300,59 @@ fn benchmarkHashmaps() !u8 {
 
     try util.printMessage("\nHashTable Benchmarks finished!");
     return 0;
+}
+
+pub fn testDijkstraShowTranslationFromPDF() !u8 {
+    var G = try grp.Graph().init(allocator, 5);
+    defer G.deinit();
+
+    const v1 = try G.createVertex("Vertex_A");
+    const v2 = try G.createVertex("Vertex_B");
+    const v3 = try G.createVertex("Vertex_C");
+    const v4 = try G.createVertex("Vertex_D");
+    const v5 = try G.createVertex("Vertex_E");
+
+    try G.addEdge(v1, v2, 12);
+    try G.addEdge(v1, v4, 87);
+    try G.addEdge(v2, v5, 11);
+    try G.addEdge(v3, v1, 19);
+    try G.addEdge(v4, v2, 23);
+    try G.addEdge(v4, v3, 10);
+    try G.addEdge(v5, v4, 43);
+
+    try dks.Dijkstra(&G, "Vertex_A");
+
+    try util.printMessage("Dijkstra algoritm result: ");
+
+    try printShortestPath(v1, "Vertex_A");
+    try printShortestPath(v2, "Vertex_B");
+    try printShortestPath(v3, "Vertex_C");
+    try printShortestPath(v4, "Vertex_D");
+    try printShortestPath(v5, "Vertex_E");
+
+    return 0;
+}
+
+fn printShortestPath(target: *grp.Graph().Vertex, target_name: []const u8) !void {
+    const writer = std.io.getStdOut().writer();
+    writer.print("From Vertex_A to {s}: ", .{target_name}) catch {};
+
+    if (target.prev == null) {
+        writer.print("No path found.\n", .{}) catch {};
+        return;
+    }
+
+    var current: ?*grp.Graph().Vertex = target;
+    var path = std.ArrayList(u8).init(allocator);
+    defer path.deinit();
+
+    while (current) |current_vertex| {
+        if (current_vertex.name) |name| {
+            try path.appendSlice(name);
+        }
+        current = current_vertex.prev;
+    }
+    writer.print("Shortest Distance: {d}\n", .{target.dist.?}) catch {};
 }
 
 test "addJsonFileToDynamicList" {
