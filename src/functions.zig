@@ -16,6 +16,22 @@ pub fn printMessage(message: []const u8) !void {
     try stdout.print("{s}\n", .{message});
 }
 
+pub fn formatByteArrayToUsize(array: []const u8) !usize {
+    var result: usize = 0;
+    for (array) |byte| {
+        // Controleer of de byte een cijfer is
+        if (byte >= '0' and byte <= '9') {
+            // Zet de byte om naar een cijfer en werk de resultaatwaarde bij
+            result *= 10;
+            result += @as(usize, byte - '0'); // Converteer het cijfer naar een getal
+        } else {
+            std.debug.print("Ongeldige invoer: '{s}'\n", .{array});
+            return error.InvalidInput;
+        }
+    }
+    return result;
+}
+
 fn formatWithSeparators(buffer: []u8, number: i64) ![]const u8 {
     var writer = std.mem.Writer(buffer[0..]);
     const abs_num = if (number < 0) -number else number;

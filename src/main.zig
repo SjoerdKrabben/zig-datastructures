@@ -4,6 +4,7 @@ const util = @import("functions.zig");
 const bm = @import("benchmarks.zig");
 const bms = @import("benchmarks_sorteren.zig");
 const bmh = @import("benchmarks_hashtable.zig");
+const bmt = @import("benchmarks_trees.zig");
 const srt = @import("datastructures/Sorting.zig");
 const htable = @import("datastructures/HashTableSeparateChaining.zig");
 const grp = @import("datastructures/Graph.zig");
@@ -15,14 +16,14 @@ const assert = std.debug.assert;
 const print = std.debug.print;
 const Timer = std.time.Timer;
 
-var selection: u8 = 0;
+var selection: usize = 0;
 const TOTALRUNS = 5;
 
 pub fn main() !void {
     const dataset_sorteren = try jsonDataset.loadDatasetSorteren(allocator);
     // const dataset_hashen = try jsonDataset.loadDatasetHashen(allocator);
 
-    const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Hashtable", "9: Dijkstra", "10: AVL-Searchtree" };
+    const options = [_][]const u8{ "1: DynamicList", "2: DoublyLinkedList", "3: Stack", "4: DoubleEndedQueue", "5: PriorityQueue", "6: BinarySearch", "7: Sorting Algoritms", "8: Hashtable", "9: Dijkstra", "10: Binary Tree", "11: AVL-Searchtree" };
 
     while (true) {
         switch (selection) {
@@ -67,22 +68,25 @@ pub fn main() !void {
                 continue;
             },
             10 => {
-                selection = 0;
+                selection = try benchmarkBinaryTree();
+                continue;
+            },
+            11 => {
+                selection = 99;
                 continue;
             },
             else => {
                 try util.printMessage("Program terminated!");
-                selection = 11;
                 break;
             },
         }
     }
 }
 
-fn showMain(opts: [10][]const u8) !u8 {
+fn showMain(opts: [11][]const u8) !usize {
     const stdin = std.io.getStdIn().reader();
-    var inputBuffer: [10]u8 = undefined;
-    var returnValue: u8 = 0;
+    var inputBuffer: [100]u8 = undefined;
+    var returnValue: usize = 0;
 
     try util.printMessage("");
     try util.printMessage("Kies uit de verschillende datastructuren en algoritmes om ze te testen: ");
@@ -94,26 +98,23 @@ fn showMain(opts: [10][]const u8) !u8 {
     try util.printMessage("\n");
     try util.printMessage("Kies een optie: ");
 
-    const input = try stdin.readUntilDelimiterOrEof(&inputBuffer, '\n');
+    if (try stdin.readUntilDelimiterOrEof(&inputBuffer, '\n')) |user_input| {
+        const trimmedInput = std.mem.trim(u8, user_input, " \t\r\n");
+        const formattedInput = try util.formatByteArrayToUsize(trimmedInput);
 
-    if (input) |val| {
-        if (val.len == 0) {
-            try util.printMessage("Je hebt niets ingevuld!");
-        } else {
-            const byteValue: []u8 = val[0..1];
-            const chosenNumber = try std.fmt.parseInt(usize, byteValue, 10);
-
-            if (chosenNumber < opts.len) {
-                print("Je hebt {s} gekozen!\n", .{opts[chosenNumber - 1]});
-            }
-
-            returnValue = @as(u8, @truncate(chosenNumber));
+        if (formattedInput < opts.len) {
+            print("Je hebt {s} gekozen!\n", .{opts[formattedInput - 1]});
         }
+
+        returnValue = formattedInput;
+    } else {
+        try util.printMessage("Je hebt niets ingevuld!");
+        returnValue = 0;
     }
     return returnValue;
 }
 
-fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !u8 {
+fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("DynamicList benchmarks LOADING...");
     var results = [_][]const u8{ "", "" };
 
@@ -130,7 +131,7 @@ fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !u8 {
     return 0;
 }
 
-fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !u8 {
+fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("DoublyLinkedList benchmarks LOADING");
     var results = [_][]const u8{ "", "" };
 
@@ -147,7 +148,7 @@ fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !u8 {
     return 0;
 }
 
-fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !u8 {
+fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("Stack LOADING");
     var results = [_][]const u8{ "", "" };
 
@@ -163,7 +164,7 @@ fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !u8 {
     return 0;
 }
 
-fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !u8 {
+fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("Double-Ended Queue LOADING");
     var results = [_][]const u8{ "", "" };
 
@@ -179,7 +180,7 @@ fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !u8 {
     return 0;
 }
 
-fn benchmarkPriorityQueue(data: jsonDataset.Dataset_sorteren) !u8 {
+fn benchmarkPriorityQueue(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("PriorityQueue LOADING");
     var results = [_][]const u8{ "", "" };
 
@@ -194,7 +195,7 @@ fn benchmarkPriorityQueue(data: jsonDataset.Dataset_sorteren) !u8 {
 
     return 0;
 }
-fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
+fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("BinarySearch test");
     var results = [_][]const u8{""};
 
@@ -209,7 +210,7 @@ fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !u8 {
     return 0;
 }
 
-fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !u8 {
+fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("Sorting Benchmarks Starting...");
     //var results = [_][]const u8{ "", "", "", "", "", "", "", "", ""};
     var results: [9][]const u8 = undefined;
@@ -291,7 +292,7 @@ fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !u8 {
     return 0;
 }
 
-fn benchmarkHashmaps() !u8 {
+fn benchmarkHashmaps() !usize {
     try util.printMessage("Hashtable Benchmarks Starting...");
     var results: [1][]const u8 = undefined;
     const result = try bmh.insert100000RandomEntries(TOTALRUNS);
@@ -302,7 +303,7 @@ fn benchmarkHashmaps() !u8 {
     return 0;
 }
 
-pub fn testDijkstraShowTranslationFromPDF() !u8 {
+fn testDijkstraShowTranslationFromPDF() !usize {
     var G = try grp.Graph().init(allocator, 5);
     defer G.deinit();
 
@@ -355,6 +356,16 @@ fn printShortestPath(target: *grp.Graph().Vertex, target_name: []const u8) !void
     writer.print("Shortest Distance: {d}\n", .{target.dist.?}) catch {};
 }
 
+fn benchmarkBinaryTree() !usize {
+    try util.printMessage("BinaryTree Benchmarks Starting...");
+    var results: [1][]const u8 = undefined;
+    const result = try bmt.btreeBenchmark();
+
+    results[0] = try std.fmt.allocPrint(allocator, "Insert even numbers => \t{any}\n", .{result});
+
+    try util.printMessage("\nHashTable Benchmarks finished!");
+    return 0;
+}
 test "addJsonFileToDynamicList" {
     const dl = @import("datastructures/DynamicList.zig");
     const dataset = try jsonDataset.loadDataset(allocator, "assets/test_json.json");

@@ -479,7 +479,7 @@ pub fn pqueBenchmark2(data: jsonDataset.Dataset_sorteren, repeat: usize) ![]cons
     defer prioque.deinit();
     var total_elapsed: u64 = 0;
 
-    try util.printMessage("Benchmark 1: Load 8001 f128 into Deque");
+    try util.printMessage("Benchmark 1: Load 8001 f128 into PriorityQueue");
 
     for (0..repeat) |i| {
         while (true) {
