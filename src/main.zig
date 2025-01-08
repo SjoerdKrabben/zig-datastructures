@@ -72,7 +72,7 @@ pub fn main() !void {
                 continue;
             },
             11 => {
-                selection = 99;
+                selection = try benchmarkAVLTree();
                 continue;
             },
             else => {
@@ -363,9 +363,21 @@ fn benchmarkBinaryTree() !usize {
 
     results[0] = try std.fmt.allocPrint(allocator, "Insert even numbers => \t{any}\n", .{result});
 
-    try util.printMessage("\nHashTable Benchmarks finished!");
+    try util.printMessage("\nBinaryTree Benchmarks finished!");
     return 0;
 }
+
+fn benchmarkAVLTree() !usize {
+    try util.printMessage("AVL-Tree Benchmarks Starting...");
+    var results: [1][]const u8 = undefined;
+    const result = try bmt.avltreeBenchmark();
+
+    results[0] = try std.fmt.allocPrint(allocator, "Insert even numbers => \t{any}\n", .{result});
+
+    try util.printMessage("\nAVL-tree Benchmarks finished!");
+    return 0;
+}
+
 test "addJsonFileToDynamicList" {
     const dl = @import("datastructures/DynamicList.zig");
     const dataset = try jsonDataset.loadDataset(allocator, "assets/test_json.json");
