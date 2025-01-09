@@ -6,35 +6,41 @@ const print = std.debug.print;
 
 pub fn quickSort(array: []i32, low: usize, high: usize) void {
     if (low < high) {
-        const pi = partition(array, low, high);
+        const pivot_index = partition(array, low, high);
 
-        if (pi > low) {
-            quickSort(array, low, pi - 1);
+        if (pivot_index > 0) {
+            quickSort(array, low, pivot_index - 1);
         }
-        quickSort(array, pi + 1, high);
+        quickSort(array, pivot_index + 1, high);
     }
 }
 
 fn partition(array: []i32, low: usize, high: usize) usize {
-    const pivot = array[high];
-    var i: usize = low;
+    const mid = low + (high - low) / 2;
 
-    for (low..high) |j| {
+    if (array[low] > array[mid]) swap(array, low, mid);
+    if (array[low] > array[high]) swap(array, low, high);
+    if (array[mid] > array[high]) swap(array, mid, high);
+
+    const pivot = array[mid];
+    swap(array, mid, high);
+
+    var i = low;
+    for (i..high) |j| {
         if (array[j] < pivot) {
-            swap(&array[i], &array[j]);
+            swap(array, j, i);
             i += 1;
         }
     }
 
-    swap(&array[i], &array[high]);
+    swap(array, i, high);
     return i;
 }
 
-fn swap(a: *i32, b: *i32) void {
-    const temp = a.*;
-
-    a.* = b.*;
-    b.* = temp;
+fn swap(array: []i32, a: usize, b: usize) void {
+    const temp = array[a];
+    array[a] = array[b];
+    array[b] = temp;
 }
 
 test "quicksort werkt correct met een gesorteerde array" {

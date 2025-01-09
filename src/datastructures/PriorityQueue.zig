@@ -1,5 +1,6 @@
 const std = @import("std");
 const dl = @import("DynamicList.zig");
+const srt = @import("Sorting.zig");
 
 const debug = std.debug;
 const assert = debug.assert;
@@ -13,9 +14,10 @@ pub fn PriorityQueue(comptime T: type) type {
         const Self = @This();
 
         list: dl.DynamicList(T),
+        sort: *const fn ([]T, usize, usize) void,
 
-        pub fn init(allocator: Allocator) Allocator.Error!Self {
-            return Self{ .list = try dl.DynamicList(T).init(allocator) };
+        pub fn init(allocator: Allocator, sort_type: *const fn ([]T, usize, usize) void) Allocator.Error!Self {
+            return Self{ .list = try dl.DynamicList(T).init(allocator), .sort = sort_type };
         }
 
         pub fn deinit(self: Self) void {
@@ -24,7 +26,8 @@ pub fn PriorityQueue(comptime T: type) type {
 
         pub fn add(self: *Self, item: T) !void {
             try self.list.add(item);
-            self.runtimeSort();
+            self.sort(self.list.items, 0, self.list.length - 1);
+            //self.runtimeSort();
         }
 
         fn runtimeSort(self: *Self) void {

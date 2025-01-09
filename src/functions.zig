@@ -1,6 +1,10 @@
 const std = @import("std");
 const allocator = std.heap.page_allocator;
 
+pub fn nsToMsCeil(ns: u64) u64 {
+    return (ns + 1_000_000 - 1) / 1_000_000;
+}
+
 pub fn formatToString(input: u64) ![]u8 {
     var buffer: [64]u8 = undefined;
 

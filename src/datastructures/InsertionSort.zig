@@ -7,13 +7,13 @@ const print = std.debug.print;
 pub fn insertionSort(array: []i32) void {
     for (1..array.len) |i| {
         const key: i32 = array[i];
-        var j: isize = @intCast(i - 1);
+        var j: usize = i;
 
-        while (j >= 0 and array[@intCast(j)] > key) {
-            array[@intCast(j + 1)] = array[@intCast(j)];
-            j = j - 1;
+        while (j > 0 and array[j - 1] > key) : (j -= 1) {
+            array[j] = array[j - 1];
         }
-        array[@intCast(j + 1)] = key;
+        print("i = {} and j = {}\n", .{ i, j });
+        array[j] = key;
     }
 }
 

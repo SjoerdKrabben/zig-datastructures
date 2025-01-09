@@ -7,62 +7,57 @@ const allocator = std.heap.page_allocator;
 const print = std.debug.print;
 const Timer = std.time.Timer;
 
+const NODES = 5000;
+
 pub fn btreeBenchmark() ![]const u8 {
-    var tree = btree.BinaryTree(u8).init(allocator);
+    var tree = btree.BinaryTree(usize).init(allocator);
+    defer tree.deinit();
+
     try util.printMessage("Benchmark 1: Add numbers to the B-Tree");
-    var total_elapsed: u64 = 0;
     var elapsed: u64 = 0;
 
-    const numbers: [9]u8 = .{ 2, 4, 6, 8, 10, 12, 14, 16, 18 };
     try util.printMessage("Starting timer...");
     var timer = try Timer.start();
-    for (numbers) |number| {
-        try tree.insert(number);
 
-        elapsed = timer.read();
-        total_elapsed += elapsed;
-        timer.reset();
+    for (1..NODES + 1) |number| {
+        try tree.insert(number);
     }
+
+    elapsed = timer.read();
+    timer.reset();
+
+    const elapsed_ms = util.nsToMsCeil(elapsed);
 
     try util.printMessage("Benchmark 1 finished!");
 
-    var average_time: u64 = 0;
-    average_time = total_elapsed / numbers.len;
+    const result = std.mem.concat(allocator, u8, &.{ "Binary Tree inserts, Time passed:\t", try util.formatToString(elapsed), "ns = ", try util.formatToString(elapsed_ms), "ms \n" });
 
-    const result = std.mem.concat(allocator, u8, &.{ "Find random number in lijst_oplopend_10000\t", try util.formatToString(average_time), "ns \n" });
-
-    try std.io.getStdOut().writer().print("Average Time passed: {}ns. Nodes in tree: {}\n", .{ average_time, numbers.len });
-
-    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
+    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}ns\n", .{elapsed});
     return result;
 }
 
 pub fn avltreeBenchmark() ![]const u8 {
-    var tree = avltree.AVLTree(u8).init(allocator);
+    var tree = avltree.AVLTree(usize).init(allocator);
+    defer tree.deinit();
     try util.printMessage("Benchmark 1: Add numbers to the AVL-Tree");
-    var total_elapsed: u64 = 0;
     var elapsed: u64 = 0;
 
-    const numbers: [9]u8 = .{ 2, 4, 6, 8, 10, 12, 14, 16, 18 };
     try util.printMessage("Starting timer...");
     var timer = try Timer.start();
-    for (numbers) |number| {
-        try tree.insert(number);
 
-        elapsed = timer.read();
-        total_elapsed += elapsed;
-        timer.reset();
+    for (0..NODES + 1) |number| {
+        try tree.insert(number);
     }
+
+    elapsed = timer.read();
+    timer.reset();
+
+    const elapsed_ms = util.nsToMsCeil(elapsed);
 
     try util.printMessage("Benchmark 1 finished!");
 
-    var average_time: u64 = 0;
-    average_time = total_elapsed / numbers.len;
+    const result = std.mem.concat(allocator, u8, &.{ "AVL-Tree inserts, Time passed:\t", try util.formatToString(elapsed), "ns = ", try util.formatToString(elapsed_ms), "ms \n" });
 
-    const result = std.mem.concat(allocator, u8, &.{ "Find random number in lijst_oplopend_10000\t", try util.formatToString(average_time), "ns \n" });
-
-    try std.io.getStdOut().writer().print("Average Time passed: {}ns. Nodes in tree: {}\n", .{ average_time, numbers.len });
-
-    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
+    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}ns\n", .{elapsed});
     return result;
 }

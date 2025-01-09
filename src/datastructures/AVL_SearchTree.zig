@@ -28,7 +28,7 @@ pub fn AVLTree(comptime T: type) type {
 
         fn deinitAt(self: *Self, node: ?*Node) void {
             const current_node = node orelse return;
-            std.debug.print("Deinit node: {}\n", .{current_node.data});
+            // std.debug.print("Deinit node: {}\n", .{current_node.data});
 
             if (current_node.left != null) {
                 self.deinitAt(current_node.left);

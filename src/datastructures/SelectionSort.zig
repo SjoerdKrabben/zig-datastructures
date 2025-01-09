@@ -5,9 +5,8 @@ const testing = std.testing;
 const print = std.debug.print;
 
 pub fn selectionSort(array: []i32) void {
-    var min_index: usize = 0;
-    for (array, 0..) |_, i| {
-        min_index = i;
+    for (0..array.len - 1) |i| {
+        var min_index = i;
 
         for (i + 1..array.len) |j| {
             if (array[j] < array[min_index]) {

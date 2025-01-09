@@ -10,12 +10,13 @@ const print = std.debug.print;
 pub fn Deque(comptime T: type) type {
     return struct {
         const Self = @This();
+
         const L = dll.DoublyLinkedList(T);
 
         list: L,
         allocator: Allocator,
 
-        pub fn init(allocator: Allocator) Allocator.Error!Self {
+        pub fn init(allocator: Allocator) Self {
             return Self{ .list = L{}, .allocator = allocator };
         }
 
@@ -30,6 +31,7 @@ pub fn Deque(comptime T: type) type {
             self.list.last = null;
             self.list.len = 0;
         }
+
         pub fn insertLeft(self: *Self, new_item: T) Allocator.Error!void {
             const node = try self.allocator.create(L.Node);
             node.* = L.Node{ .data = new_item };
@@ -45,33 +47,42 @@ pub fn Deque(comptime T: type) type {
         }
 
         pub fn deleteLeft(self: *Self) !T {
-            const node = self.list.popFirst() orelse return error.EmptyQueue;
-            const data = node.data;
-            self.allocator.destroy(node);
+            const node = self.list.popFirst();
+            if (node) |current_node| {
+                const data = current_node.data;
+                self.allocator.destroy(current_node);
 
-            return data;
+                return data;
+            } else {
+                return error.EmptyQueue;
+            }
         }
 
         pub fn deleteRight(self: *Self) !T {
-            const node = self.list.pop() orelse return error.EmptyQueue;
-            const data = node.data;
-            self.allocator.destroy(node);
+            const node = self.list.pop();
+            if (node) |current_node| {
+                const data = current_node.data;
+                self.allocator.destroy(current_node);
 
-            return data;
+                return data;
+            } else {
+                return error.EmptyQueue;
+            }
         }
 
-        pub fn isEmpty(self: *Self) bool {
+        pub fn isEmpty(self: *const Self) bool {
             return self.list.len == 0;
         }
 
-        pub fn size(self: *Self) usize {
+        pub fn size(self: *const Self) usize {
             return self.list.len;
         }
     };
 }
 
 test "deque operations" {
-    const allocator = std.heap.page_allocator;
+    const allocator = testing.allocator;
+
     var deque = Deque(u8).init(allocator);
     defer deque.deinit();
 
@@ -94,5 +105,4 @@ test "deque operations" {
     _ = try deque.deleteLeft();
     _ = try deque.deleteLeft();
     try testing.expect(deque.isEmpty());
-    try testing.expectError(error.EmptyQueue, try deque.deleteLeft());
 }

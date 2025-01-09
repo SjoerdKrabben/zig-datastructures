@@ -61,7 +61,7 @@ pub fn Stack(comptime T: type) type {
 }
 
 test "stack operations" {
-    const allocator = std.heap.page_allocator;
+    const allocator = testing.allocator;
 
     var stack = Stack(u16).init(allocator);
     defer stack.deinit();

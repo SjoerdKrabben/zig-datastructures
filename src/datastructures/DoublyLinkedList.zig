@@ -32,7 +32,6 @@ pub fn DoublyLinkedList(comptime T: type) type {
             }
             node.next = new_node;
 
-            // print("Added node: {}, new length: {}\n", .{ new_node.data, list.len + 1 });
             list.len += 1;
         }
 

@@ -116,11 +116,13 @@ fn showMain(opts: [11][]const u8) !usize {
 
 fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("DynamicList benchmarks LOADING...");
-    var results = [_][]const u8{ "", "" };
+    var results = [_][]const u8{ "", "", "" };
 
     results[0] = try bm.dlBenchmark1(data, TOTALRUNS);
 
     results[1] = try bm.dlBenchmark2(data, TOTALRUNS);
+
+    results[2] = try bm.dlBenchmark3(data, TOTALRUNS);
 
     try util.printMessage("\nDynamicList Benchmarks finished!");
 
@@ -232,14 +234,14 @@ fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !usize {
         }
     }
 
-    if (bms.sortLowHighLijstWillekeurigBenchmark(sort.quickSort, data, TOTALRUNS)) |result| {
+    if (bms.sortLijstWillekeurigBenchmark(sort.quickSort, data, TOTALRUNS)) |result| {
         results[2] = try std.fmt.allocPrint(allocator, "3. QuickSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
             else => results[2] = "QuickSort Failed!",
         }
     }
-    if (bms.sortLowHighLijstWillekeurigBenchmark(sort.mergeSort, data, TOTALRUNS)) |result| {
+    if (bms.sortLijstWillekeurigBenchmark(sort.mergeSort, data, TOTALRUNS)) |result| {
         results[3] = try std.fmt.allocPrint(allocator, "4. Parallel-MergeSort => \t{s}\n", .{result});
     } else |err| {
         switch (err) {
@@ -267,7 +269,7 @@ fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !usize {
         }
     }
 
-    if (bms.sortLowHigh100000Random(newSort.quickSort, TOTALRUNS)) |result| {
+    if (bms.sort100000Random(newSort.quickSort, TOTALRUNS)) |result| {
         results[7] = try std.fmt.allocPrint(allocator, "7. QuickSort => \t\t{s}\n", .{result});
     } else |err| {
         switch (err) {
@@ -275,7 +277,7 @@ fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !usize {
         }
     }
 
-    if (bms.sortLowHigh100000Random(newSort.mergeSort, TOTALRUNS)) |result| {
+    if (bms.sort100000Random(newSort.mergeSort, TOTALRUNS)) |result| {
         results[8] = try std.fmt.allocPrint(allocator, "8. Parallel-MergeSort => \t{s}\n", .{result});
     } else |err| {
         switch (err) {
@@ -297,9 +299,14 @@ fn benchmarkHashmaps() !usize {
     var results: [1][]const u8 = undefined;
     const result = try bmh.insert100000RandomEntries(TOTALRUNS);
 
-    results[0] = try std.fmt.allocPrint(allocator, "Insert Random numbers => \t{any}\n", .{result});
+    results[0] = try std.fmt.allocPrint(allocator, "Insert Random numbers => \t{s}\n", .{result});
 
     try util.printMessage("\nHashTable Benchmarks finished!");
+
+    for (results) |r| {
+        try std.io.getStdOut().writer().print("{s}", .{r});
+    }
+
     return 0;
 }
 
@@ -361,9 +368,14 @@ fn benchmarkBinaryTree() !usize {
     var results: [1][]const u8 = undefined;
     const result = try bmt.btreeBenchmark();
 
-    results[0] = try std.fmt.allocPrint(allocator, "Insert even numbers => \t{any}\n", .{result});
+    results[0] = try std.fmt.allocPrint(allocator, "Binary Tree => \t{s}\n", .{result});
 
     try util.printMessage("\nBinaryTree Benchmarks finished!");
+
+    for (results) |r| {
+        try std.io.getStdOut().writer().print("{s}", .{r});
+    }
+
     return 0;
 }
 
@@ -372,9 +384,14 @@ fn benchmarkAVLTree() !usize {
     var results: [1][]const u8 = undefined;
     const result = try bmt.avltreeBenchmark();
 
-    results[0] = try std.fmt.allocPrint(allocator, "Insert even numbers => \t{any}\n", .{result});
+    results[0] = try std.fmt.allocPrint(allocator, "AVL-Searchtree => \t{s}\n", .{result});
 
     try util.printMessage("\nAVL-tree Benchmarks finished!");
+
+    for (results) |r| {
+        try std.io.getStdOut().writer().print("{s}", .{r});
+    }
+
     return 0;
 }
 
