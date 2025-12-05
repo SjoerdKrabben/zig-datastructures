@@ -36,7 +36,7 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void, data: 
         }
 
         std.debug.assert(sortedList.len == data.lijst_willekeurig_10000.len);
-        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
+        try util.write_message("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
     var average_time: u64 = 0;
     if (repeat > 1) {
@@ -45,12 +45,12 @@ pub fn sortLijstWillekeurigBenchmark(sort: fn ([]u16, usize, usize) void, data: 
         average_time = total_elapsed;
     }
 
-    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
+    try util.write_message("Average time passed: {}ns.\n", .{average_time});
 
     const average_ms = util.nsToMsCeil(average_time);
-    const result = std.mem.concat(allocator, u8, &.{ " lijst_willekeurig_10000: \t", try util.formatToString(average_time), "ns  = ", try util.formatToString(average_ms), "ms \n" });
+    const result = std.fmt.allocPrint(allocator, " lijst_willekeurig_10000: \t {}ns  = {}ms \n", .{average_time, average_ms});
 
-    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
+    try util.write_message("Benchmark 1 finished! Total time: {}\n", .{total_elapsed});
     return result;
 }
 
@@ -83,7 +83,7 @@ pub fn sort100000Random(sort: fn ([]u32, usize, usize) void, repeat: usize) ![]c
             total_elapsed += elapsed;
         }
 
-        try std.io.getStdOut().writer().print("Run {}, Time {}ns \n", .{ i + 1, elapsed });
+        try util.write_message("Run {}, Time {}ns \n", .{ i + 1, elapsed });
     }
     var average_time: u64 = 0;
     if (repeat > 1) {
@@ -92,11 +92,11 @@ pub fn sort100000Random(sort: fn ([]u32, usize, usize) void, repeat: usize) ![]c
         average_time = total_elapsed;
     }
 
-    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
+    try util.write_message("Average time passed: {}ns.\n", .{average_time});
 
     const average_ms = util.nsToMsCeil(average_time);
-    const result = std.mem.concat(allocator, u8, &.{ " 100000 Random numbers: \t", try util.formatToString(average_time), "ns  = ", try util.formatToString(average_ms), "ms \n" });
+    const result = std.fmt.allocPrint(allocator, " 100000 Random numbers: \t {}ns  = {}ms \n", .{average_time, average_ms});
 
-    try std.io.getStdOut().writer().print("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
+    try util.write_message("Benchmark 2 finished! Total time: {}\n", .{total_elapsed});
     return result;
 }

@@ -19,10 +19,16 @@ pub fn loadDatasetSorteren(allocator: std.mem.Allocator) !Dataset_sorteren {
     const file = try std.fs.cwd().openFile("assets/test_json.json", .{});
     defer file.close();
 
-    const file_content = try file.readToEndAlloc(allocator, std.math.maxInt(usize));
-    defer allocator.free(file_content);
+    const stat = try file.stat();
 
-    const parsed = try std.json.parseFromSlice(Dataset_sorteren, allocator, file_content, .{});
+
+    const buffer = try allocator.alloc(u8, stat.size);
+    defer allocator.free(buffer);
+
+    const bytes_read = try file.read(buffer);
+    std.debug.print("Bytes read: {d}\n", .{bytes_read});
+
+    const parsed = try std.json.parseFromSlice(Dataset_sorteren, allocator, buffer, .{});
     defer parsed.deinit();
 
     const source: Dataset_sorteren = parsed.value;

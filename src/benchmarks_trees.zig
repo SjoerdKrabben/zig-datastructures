@@ -30,9 +30,9 @@ pub fn btreeBenchmark() ![]const u8 {
 
     try util.printMessage("Benchmark 1 finished!");
 
-    const result = std.mem.concat(allocator, u8, &.{ "Binary Tree inserts, Time passed:\t", try util.formatToString(elapsed), "ns = ", try util.formatToString(elapsed_ms), "ms \n" });
+    const result = std.fmt.allocPrint(allocator, "Binary Tree inserts, Time passed:\t {}ns = {}ms \n", .{elapsed, elapsed_ms});
 
-    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}ns\n", .{elapsed});
+    try util.write_message("Benchmark 1 finished! Total time: {}ns = {}ms \n", .{elapsed, elapsed_ms});
     return result;
 }
 
@@ -56,8 +56,8 @@ pub fn avltreeBenchmark() ![]const u8 {
 
     try util.printMessage("Benchmark 1 finished!");
 
-    const result = std.mem.concat(allocator, u8, &.{ "AVL-Tree inserts, Time passed:\t", try util.formatToString(elapsed), "ns = ", try util.formatToString(elapsed_ms), "ms \n" });
+    const result = std.fmt.allocPrint(allocator, "AVL-Tree inserts, Time passed:\t {}ns = {}ms \n", .{elapsed, elapsed_ms});
 
-    try std.io.getStdOut().writer().print("Benchmark 1 finished! Total time: {}ns\n", .{elapsed});
+    try util.write_message("Benchmark 1 finished! Total time: {}ns = {}ms \n", .{elapsed, elapsed_ms});
     return result;
 }

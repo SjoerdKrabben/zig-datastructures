@@ -24,7 +24,7 @@ pub fn insert100000RandomEntries(repeat: usize) ![]const u8 {
     try util.printMessage("Benchmark 1: Inserting 100000 Random Numbers");
 
     for (0..TOTAL_SIZE) |j| {
-        const key = try std.mem.concat(allocator, u8, &.{ "key", try util.formatToString(j) });
+        const key = try std.fmt.allocPrint(allocator, "key_{}", .{j});
         const rand = std.crypto.random;
         const number = rand.intRangeAtMost(u32, 0, TOTAL_SIZE);
         keys[j] = key;
@@ -60,7 +60,7 @@ pub fn insert100000RandomEntries(repeat: usize) ![]const u8 {
             total_elapsed2 += elapsed2;
         }
 
-        try std.io.getStdOut().writer().print("Run {}: \tLinearProbing Time {}ns | SeparateChaining Time {}ns \n", .{ i + 1, elapsed, elapsed2 });
+        try util.write_message("Run {}: \tLinearProbing Time {}ns | SeparateChaining Time {}ns \n", .{ i + 1, elapsed, elapsed2 });
     }
     var average_time: u64 = 0;
     var average_time2: u64 = 0;
@@ -72,10 +72,10 @@ pub fn insert100000RandomEntries(repeat: usize) ![]const u8 {
         average_time2 = total_elapsed2;
     }
 
-    try std.io.getStdOut().writer().print("Average time passed: {}ns.\n", .{average_time});
+    try util.write_message("Average time passed: {}ns.\n", .{average_time});
 
-    const result = try std.mem.concat(allocator, u8, &.{ "Insert 100000 Random numbers \tLinearProbing:", try util.formatToString(average_time), "ns \tSeparateChaining:", try util.formatToString(average_time2), "ns\n" });
+    const result = try std.fmt.allocPrint(allocator, "Insert 100000 Random numbers \tLinearProbing: {}ns \tSeparateChaining: {}ns\n", .{average_time, average_time2});
 
-    try std.io.getStdOut().writer().print("Benchmark 2 finished! Total LinearProbing: {}ns | Total SeparateChaining: {}ns | Total time: {}\n", .{ total_elapsed, total_elapsed2, total_elapsed + total_elapsed2 });
+    try util.write_message("Benchmark 2 finished! Total LinearProbing: {}ns | Total SeparateChaining: {}ns | Total time: {}\n", .{ total_elapsed, total_elapsed2, total_elapsed + total_elapsed2 });
     return result;
 }

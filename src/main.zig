@@ -84,8 +84,10 @@ pub fn main() !void {
 }
 
 fn showMain(opts: [11][]const u8) !usize {
-    const stdin = std.io.getStdIn().reader();
-    var inputBuffer: [100]u8 = undefined;
+    var stdin_buffer: [1024]u8 = undefined; 
+    var stdin_reader = std.fs.File.stdin().reader(&stdin_buffer);
+    const stdin: *std.Io.Reader = &stdin_reader.interface;
+
     var returnValue: usize = 0;
 
     try util.printMessage("");
@@ -98,18 +100,38 @@ fn showMain(opts: [11][]const u8) !usize {
     try util.printMessage("\n");
     try util.printMessage("Kies een optie: ");
 
-    if (try stdin.readUntilDelimiterOrEof(&inputBuffer, '\n')) |user_input| {
-        const trimmedInput = std.mem.trim(u8, user_input, " \t\r\n");
-        const formattedInput = try util.formatByteArrayToUsize(trimmedInput);
+    var stdout_buffer: [512]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout: *std.Io.Writer = &stdout_writer.interface;
 
-        if (formattedInput < opts.len) {
-            print("Je hebt {s} gekozen!\n", .{opts[formattedInput - 1]});
+    if(stdin.takeDelimiterExclusive('\n')) |line| {
+        try stdout.print("{s}", .{line});
+        if(line.len > 0) {
+            const trimmedInput = std.mem.trim(u8, line, " \t\r\n");
+            const formattedInput = try util.formatByteArrayToUsize(trimmedInput);
+
+            if (formattedInput < opts.len) {
+                try stdout.print("Je hebt {s} gekozen!\n", .{opts[formattedInput - 1]});
+                try stdout.flush();
+            }
+
+            returnValue = formattedInput;
         }
-
-        returnValue = formattedInput;
-    } else {
-        try util.printMessage("Je hebt niets ingevuld!");
-        returnValue = 0;
+    } else |err| switch (err) {
+        error.EndOfStream => {
+            try util.printMessage("Je hebt niets ingevuld!");
+            returnValue = 0;
+            // reached end
+            // the normal case
+        },
+        error.StreamTooLong => {
+            // the line was longer than the internal buffer
+            return err;
+        },
+        error.ReadFailed => {
+            // the read failed
+            return err;
+        },
     }
     return returnValue;
 }
@@ -127,7 +149,7 @@ fn benchmarkDynamicList(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("\nDynamicList Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -144,7 +166,7 @@ fn benchmarkDoublyLinkedList(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("\nDoublyLinkedList Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -160,7 +182,7 @@ fn benchmarkStack(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("\nStack Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -176,7 +198,7 @@ fn benchmarkDeque(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("\nDouble-Ended Queue Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -192,7 +214,7 @@ fn benchmarkPriorityQueue(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("\nPriorityQueue Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -206,7 +228,7 @@ fn benchmarkBinarySearch(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("\nBinarySearch Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -288,7 +310,7 @@ fn benchmarkSortingAlgoritms(data: jsonDataset.Dataset_sorteren) !usize {
     try util.printMessage("\nSorting Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -304,7 +326,7 @@ fn benchmarkHashmaps() !usize {
     try util.printMessage("\nHashTable Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -342,25 +364,24 @@ fn testDijkstraShowTranslationFromPDF() !usize {
 }
 
 fn printShortestPath(target: *grp.Graph().Vertex, target_name: []const u8) !void {
-    const writer = std.io.getStdOut().writer();
-    writer.print("From Vertex_A to {s}: ", .{target_name}) catch {};
+    try util.write_message("From Vertex_A to {s}: ", .{target_name});
 
     if (target.prev == null) {
-        writer.print("No path found.\n", .{}) catch {};
+        try util.write_message("No path found.\n", .{});
         return;
     }
 
     var current: ?*grp.Graph().Vertex = target;
-    var path = std.ArrayList(u8).init(allocator);
-    defer path.deinit();
+    var path = std.ArrayList(u8).empty;
+    defer path.deinit(allocator);
 
     while (current) |current_vertex| {
         if (current_vertex.name) |name| {
-            try path.appendSlice(name);
+            try path.appendSlice(allocator, name);
         }
         current = current_vertex.prev;
     }
-    writer.print("Shortest Distance: {d}\n", .{target.dist.?}) catch {};
+    try util.write_message("Shortest Distance: {d}\n", .{target.dist.?});
 }
 
 fn benchmarkBinaryTree() !usize {
@@ -373,7 +394,7 @@ fn benchmarkBinaryTree() !usize {
     try util.printMessage("\nBinaryTree Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;
@@ -389,7 +410,7 @@ fn benchmarkAVLTree() !usize {
     try util.printMessage("\nAVL-tree Benchmarks finished!");
 
     for (results) |r| {
-        try std.io.getStdOut().writer().print("{s}", .{r});
+        try util.write_message("{s}", .{r});
     }
 
     return 0;

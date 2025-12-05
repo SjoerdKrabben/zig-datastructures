@@ -1,33 +1,40 @@
-const std = @import("std");
+const std = @import("std"); 
+const builtin = @import("builtin");
 const allocator = std.heap.page_allocator;
+
+pub fn write_message(comptime msg: []const u8, args: anytype) !void {
+    var stdout_buffer: [1024]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout: *std.Io.Writer = &stdout_writer.interface;
+
+    try stdout.print(msg, args);
+    try stdout.flush();
+}
 
 pub fn nsToMsCeil(ns: u64) u64 {
     return (ns + 1_000_000 - 1) / 1_000_000;
 }
 
-pub fn formatToString(input: u64) ![]u8 {
+pub fn formatToString(comptime input: u64) ![]u8 {
     var buffer: [64]u8 = undefined;
-
-    const slice = std.fmt.bufPrintIntToSlice(&buffer, @as(u64, input), 10, .lower, .{});
+    const m_input: u64 = @as(u64, input);
+                       // buf: []u8, comptime fmt: []const u8, args: anytype
+    const slice = std.fmt.bufPrint(&buffer, m_input, .{});
     const result = try allocator.dupe(u8, slice);
 
     return result;
 }
 
 pub fn printMessage(message: []const u8) !void {
-    const stdout = std.io.getStdOut().writer();
-
-    try stdout.print("{s}\n", .{message});
+    std.debug.print("{s}\n", .{message});
 }
 
 pub fn formatByteArrayToUsize(array: []const u8) !usize {
     var result: usize = 0;
     for (array) |byte| {
-        // Controleer of de byte een cijfer is
         if (byte >= '0' and byte <= '9') {
-            // Zet de byte om naar een cijfer en werk de resultaatwaarde bij
             result *= 10;
-            result += @as(usize, byte - '0'); // Converteer het cijfer naar een getal
+            result += @as(usize, byte - '0');         
         } else {
             std.debug.print("Ongeldige invoer: '{s}'\n", .{array});
             return error.InvalidInput;
