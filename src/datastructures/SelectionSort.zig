@@ -23,11 +23,20 @@ pub fn selectionSort(array: []i32) void {
 }
 
 test "Test selectionSort" {
+    var a: i32 = undefined;
+    var b: i32 = undefined;
+    var c: i32 = undefined;
+    var d: i32 = undefined;
+    var e: i32 = undefined;
     var array: [5]i32 = [_]i32{ 64, 25, 12, 22, 11 };
 
-    print("Originele array: {d}\n", .{array[0..]});
+    a,b,c,d,e = array;
+    print("Originele array: {d},{d},{d},{d},{d}\n", .{a,b,c,d,e});
+
     selectionSort(&array);
-    print("Gesorteerde array: {d}\n", .{array[0..]});
+
+    a,b,c,d,e = array;
+    print("Gesorteerde array: {d},{d},{d},{d},{d}\n", .{a,b,c,d,e});
 
     var data: [5]i32 = [_]i32{ 5, 3, 4, 1, 2 };
     selectionSort(&data);
